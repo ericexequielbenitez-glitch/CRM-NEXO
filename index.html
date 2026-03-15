@@ -2,12 +2,9 @@
 <html lang="es">
 
 <head>
-
 <meta charset="UTF-8">
 <title>Kairo CRM</title>
-
 <style>
-
 body{
 font-family:Arial;
 margin:0;
@@ -15,14 +12,12 @@ background:#f4f6f9;
 }
 
 /* LOGIN */
-
 .login-container{
 display:flex;
 justify-content:center;
 align-items:center;
 height:100vh;
 }
-
 .card{
 background:white;
 padding:30px;
@@ -31,12 +26,10 @@ box-shadow:0 6px 15px rgba(0,0,0,0.1);
 text-align:center;
 width:360px;
 }
-
 .card img{
 width:120px;
 margin-bottom:10px;
 }
-
 .card input{
 width:90%;
 padding:10px;
@@ -44,7 +37,6 @@ margin-top:10px;
 border:1px solid #ccc;
 border-radius:5px;
 }
-
 .card button{
 width:95%;
 padding:10px;
@@ -57,7 +49,6 @@ cursor:pointer;
 }
 
 /* CRM */
-
 .sidebar{
 width:220px;
 height:100vh;
@@ -66,7 +57,6 @@ color:white;
 position:fixed;
 padding:20px;
 }
-
 .sidebar button{
 width:100%;
 padding:10px;
@@ -74,12 +64,10 @@ margin-top:10px;
 border:none;
 cursor:pointer;
 }
-
 .main{
 margin-left:240px;
 padding:40px;
 }
-
 .card-panel{
 background:white;
 padding:25px;
@@ -87,404 +75,193 @@ border-radius:8px;
 box-shadow:0 4px 10px rgba(0,0,0,0.1);
 max-width:600px;
 }
-
-.hidden{
-display:none;
-}
-
+.hidden{display:none;}
 input,select{
 padding:8px;
 margin:5px;
 width:220px;
 }
-
 table{
 width:100%;
 border-collapse:collapse;
 margin-top:20px;
 }
-
 td,th{
 border-bottom:1px solid #ddd;
 padding:10px;
 }
-
 </style>
-
 </head>
 
 <body>
 
 <!-- LOGIN -->
-
 <div id="login" class="login-container">
-
 <div class="card">
-
 <img src="Kairo logo.png">
-
 <h2>CRM</h2>
-
 <input id="user" placeholder="Usuario">
 <input id="pass" type="password" placeholder="Contraseña">
-
 <button onclick="login()">Ingresar</button>
-
 </div>
-
 </div>
 
 <!-- CRM -->
-
 <div id="crm" class="hidden">
-
 <div class="sidebar">
-
 <h3>Kairo CRM</h3>
-
 <button onclick="dashboard()">Dashboard</button>
-
 <button onclick="nuevaVenta()">Nueva venta</button>
-
 <button onclick="verAlumnos()">Buscar alumnos</button>
-
 </div>
 
 <div class="main">
-
 <div id="panel" class="card-panel">
-
 <h3>Panel</h3>
 <p>Bienvenido al CRM del instituto Kairo</p>
-
 </div>
 
 <div id="wizard" class="card-panel hidden"></div>
 
 <div id="alumnos" class="card-panel hidden">
-
 <h3>Alumnos</h3>
-
 <input id="buscar" placeholder="Buscar..." onkeyup="buscar()">
-
 <table>
-
 <thead>
-
 <tr>
 <th>ID</th>
 <th>Nombre</th>
 <th>Curso</th>
 <th>Estado</th>
 </tr>
-
 </thead>
-
 <tbody id="tabla"></tbody>
-
 </table>
-
 </div>
-
 </div>
-
 </div>
 
 <script>
-
-const usuarios=[
-{user:"admin",pass:"1234"},
-{user:"ventas",pass:"1234"}
-]
-
+const usuarios=[{user:"admin",pass:"1234"},{user:"ventas",pass:"1234"}]
 let alumnos=JSON.parse(localStorage.getItem("alumnos"))||[]
-
 let paso=1
 let venta={}
+let carrito=[]
 
 function login(){
-
 let u=document.getElementById("user").value
 let p=document.getElementById("pass").value
-
 let ok=usuarios.find(x=>x.user===u && x.pass===p)
-
 if(ok){
-
 document.getElementById("login").style.display="none"
 document.getElementById("crm").classList.remove("hidden")
-
+}else{alert("Usuario o contraseña incorrectos")}
 }
 
-else{
-
-alert("Usuario o contraseña incorrectos")
-
-}
-
-}
-
-function ocultar(){
-
-document.querySelectorAll("#panel,#wizard,#alumnos").forEach(x=>x.classList.add("hidden"))
-
-}
-
-function dashboard(){
-
-ocultar()
-document.getElementById("panel").classList.remove("hidden")
-
-}
-
-function nuevaVenta(){
-
-paso=1
-venta={}
-
-ocultar()
-
-document.getElementById("wizard").classList.remove("hidden")
-
-mostrarPaso()
-
-}
+function ocultar(){document.querySelectorAll("#panel,#wizard,#alumnos").forEach(x=>x.classList.add("hidden"))}
+function dashboard(){ocultar();document.getElementById("panel").classList.remove("hidden")}
+function nuevaVenta(){paso=1;venta={};carrito=[];ocultar();document.getElementById("wizard").classList.remove("hidden");mostrarPaso()}
 
 function mostrarPaso(){
-
 let w=document.getElementById("wizard")
-
 if(paso===1){
-
 w.innerHTML=`
-
 <h3>Paso 1 — Datos personales</h3>
-
 <input id="nombre" placeholder="Nombre">
 <input id="apellido" placeholder="Apellido">
-<input id="dni" placeholder="DNI">
-
-<br><br>
-
-<button onclick="guardarDatos()">Siguiente</button>
-
-`
-
+<input id="dni" placeholder="DNI"><br><br>
+<button onclick="guardarDatos()">Siguiente</button>`
 }
-
 if(paso===2){
-
 w.innerHTML=`
-
-<h3>Paso 2 — Curso</h3>
-
-<select id="curso" onchange="precio()">
-
-<option value="">Curso</option>
-<option value="idioma">Idioma</option>
-<option value="office">Office</option>
-<option value="tecnico">Reparación PC</option>
-
-</select>
-
-<div id="precio"></div>
-
-<br>
-
-<button onclick="siguiente()">Siguiente</button>
-
-`
-
+<h3>Paso 2 — Selección de cursos</h3>
+<select id="curso">
+<option value="">Seleccione un curso</option>
+<option value="excel-basico">Excel Básico</option>
+<option value="excel-intermedio">Excel Intermedio</option>
+<option value="excel-avanzado">Excel Avanzado</option>
+<option value="word">Word</option>
+<option value="powerpoint">Power Point</option>
+<option value="publisher">Publisher</option>
+<option value="access">Access</option>
+<option value="office-plus">Office Plus</option>
+<option value="ingles">Inglés</option>
+<option value="frances">Francés</option>
+<option value="portugues">Portugués</option>
+</select><br><br>
+<button onclick="agregarCarrito()">🛒 Añadir al carrito</button>
+<div id="carrito"></div><br>
+<button onclick="siguiente()">Siguiente</button>`
 }
-
 if(paso===3){
-
 w.innerHTML=`
-
 <h3>Paso 3 — Promoción</h3>
-
 <select id="promo" onchange="promo()">
-
 <option value="0">Sin promo</option>
 <option value="25">25%</option>
 <option value="30">30%</option>
 <option value="50">50%</option>
 <option value="10">Idioma 10%</option>
-
 </select>
-
-<div id="total"></div>
-
-<br>
-
-<button onclick="siguiente()">Siguiente</button>
-
-`
-
+<div id="total"></div><br>
+<button onclick="siguiente()">Siguiente</button>`
 }
-
 if(paso===4){
-
 w.innerHTML=`
-
 <h3>Paso 4 — Pago</h3>
-
 <select id="pago">
-
 <option>No pagó</option>
 <option>Pagó</option>
-
-</select>
-
-<br><br>
-
-<button onclick="finalizar()">Finalizar</button>
-
-`
-
+</select><br><br>
+<button onclick="finalizar()">Finalizar</button>`
+}
 }
 
-}
+function guardarDatos(){venta.nombre=document.getElementById("nombre").value;siguiente()}
+function siguiente(){paso++;mostrarPaso()}
 
-function guardarDatos(){
-
-venta.nombre=document.getElementById("nombre").value
-
-siguiente()
-
-}
-
-function siguiente(){
-
-paso++
-mostrarPaso()
-
-}
-
-function precio(){
-
+function agregarCarrito(){
 let curso=document.getElementById("curso").value
-
-let ins=0
-let men=0
-
-if(curso==="idioma"){ins=20;men=20}
-if(curso==="office"){ins=7;men=10}
-if(curso==="tecnico"){ins=10;men=15}
-
-venta.curso=curso
-venta.mensual=men
-
-document.getElementById("precio").innerHTML=
-
-"Inscripción: USD "+ins+"<br>Cuota mensual: USD "+men
-
+if(curso){
+carrito.push(curso)
+document.getElementById("carrito").innerHTML="<h4>Carrito:</h4><ul>"+carrito.map(c=>"<li>"+c+"</li>").join("")+"</ul>"
+venta.cursos=carrito
+}else{alert("Seleccione un curso antes de añadir al carrito")}
 }
 
 function promo(){
-
 let p=parseInt(document.getElementById("promo").value)
-
-let total=venta.mensual
-
-if(venta.curso==="idioma" && p===10){
-
-total=total*0.9
-
-}else{
-
-total=total*(1-p/100)
-
-}
-
+let total=carrito.length*20 // ejemplo: cada curso 20 USD
+if(venta.cursos && venta.cursos.includes("ingles") && p===10){total=total*0.9}else{total=total*(1-p/100)}
 venta.total=total
-
-document.getElementById("total").innerHTML=
-
-"Cuota con promo: USD "+total.toFixed(2)
-
+document.getElementById("total").innerHTML="Total con promo: USD "+total.toFixed(2)
 }
 
-function generarID(){
-
-return "ALU-"+Math.floor(Math.random()*100000)
-
-}
-
-function generarGestion(){
-
-return "GEST-"+Date.now()
-
-}
+function generarID(){return "ALU-"+Math.floor(Math.random()*100000)}
+function generarGestion(){return "GEST-"+Date.now()}
 
 function finalizar(){
-
-let alumno={
-
-id:generarID(),
-gestion:generarGestion(),
-nombre:venta.nombre,
-curso:venta.curso,
-estado:document.getElementById("pago").value==="Pagó"?"Activo":"Inactivo"
-
-}
-
+let alumno={id:generarID(),gestion:generarGestion(),nombre:venta.nombre,curso:(venta.cursos||[]).join(", "),estado:document.getElementById("pago").value==="Pagó"?"Activo":"Inactivo"}
 alumnos.push(alumno)
-
 localStorage.setItem("alumnos",JSON.stringify(alumnos))
-
 alert("Alumno registrado")
-
 dashboard()
-
 }
 
-function verAlumnos(){
-
-ocultar()
-
-document.getElementById("alumnos").classList.remove("hidden")
-
-render()
-
-}
-
+function verAlumnos(){ocultar();document.getElementById("alumnos").classList.remove("hidden");render()}
 function render(){
-
 let tabla=document.getElementById("tabla")
-
 tabla.innerHTML=""
-
 alumnos.forEach(a=>{
-
-tabla.innerHTML+=`
-
-<tr>
-<td>${a.id}</td>
-<td>${a.nombre}</td>
-<td>${a.curso}</td>
-<td>${a.estado}</td>
-</tr>
-
-`
-
+tabla.innerHTML+=`<tr><td>${a.id}</td><td>${a.nombre}</td><td>${a.curso}</td><td>${a.estado}</td></tr>`
 })
-
 }
-
 function buscar(){
-
 let f=document.getElementById("buscar").value.toLowerCase()
-
 document.querySelectorAll("#tabla tr").forEach(r=>{
-
 r.style.display=r.innerText.toLowerCase().includes(f)?"":"none"
-
 })
-
 }
-
 </script>
-
 </body>
 </html>
