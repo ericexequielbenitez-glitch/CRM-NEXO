@@ -2,198 +2,375 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Kairo CRM</title>
+<title>Kairo CRM - Gestión alumnos</title>
+
+<!-- Librerías -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
 <style>
-    body { font-family: Arial; margin: 20px; }
-    .card { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-    .btn { padding: 8px 12px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 5px; }
-    .btn-danger { background: #d9534f; }
-    .btn-success { background: #5cb85c; }
+    body { font-family: Arial, sans-serif; margin: 0; background:#f4f6f9; }
+    header { background:#1b4f72; color:white; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
+    header h1 { margin:0; font-size:20px; }
+    .top-actions button { margin-left:10px; }
+    .btn { padding:8px 12px; border:none; border-radius:4px; cursor:pointer; font-size:13px; }
+    .btn-primary { background:#007bff; color:white; }
+    .btn-success { background:#28a745; color:white; }
+    .btn-danger { background:#dc3545; color:white; }
+    .btn-secondary { background:#6c757d; color:white; }
+    .container { padding:20px; }
+    .card { background:white; border-radius:6px; padding:15px; margin-bottom:20px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+    .card h2 { margin-top:0; font-size:18px; }
+    .label { font-weight:bold; }
+    input, select { padding:6px; border-radius:4px; border:1px solid #ccc; width:100%; max-width:300px; }
+    .row { display:flex; gap:20px; flex-wrap:wrap; }
+    .col { flex:1; min-width:260px; }
+    #loginScreen { display:flex; height:100vh; align-items:center; justify-content:center; background:#1b4f72; }
+    #loginBox { background:white; padding:25px; border-radius:8px; width:320px; box-shadow:0 2px 6px rgba(0,0,0,0.3); }
+    #loginBox h2 { margin-top:0; text-align:center; }
+    .small { font-size:12px; color:#666; }
+    table { border-collapse:collapse; width:100%; font-size:13px; }
+    th, td { border:1px solid #ddd; padding:6px; text-align:left; }
+    th { background:#f0f0f0; }
 </style>
 </head>
 <body>
 
-<h1>📘 Kairo CRM</h1>
-
-<div class="card">
-    <h2>➕ Crear Alumno</h2>
-    <input id="nombre" placeholder="Nombre del alumno"><br><br>
-    <input id="email" placeholder="Email"><br><br>
-    <input id="monto" placeholder="Monto mensual"><br><br>
-    <button class="btn" onclick="crearAlumno()">Crear alumno</button>
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div id="loginBox">
+    <h2>Kairo CRM</h2>
+    <p class="small">Inicio de sesión</p>
+    <label>Usuario</label><br>
+    <input id="loginUser" placeholder="admin"><br><br>
+    <label>Contraseña</label><br>
+    <input id="loginPass" type="password" placeholder="1234"><br><br>
+    <button class="btn btn-primary" onclick="login()">Ingresar</button>
+  </div>
 </div>
 
-<div class="card">
-    <h2>📋 Lista de alumnos</h2>
-    <div id="listaAlumnos"></div>
+<!-- APP -->
+<div id="app" style="display:none;">
+  <header>
+    <h1>Gestión alumnos - Kairo</h1>
+    <div class="top-actions">
+      <button class="btn btn-secondary" onclick="mostrarPanel('inicio')">Inicio</button>
+      <button class="btn btn-primary" onclick="mostrarPanel('buscar')">Buscar alumnos</button>
+      <button class="btn btn-success" onclick="mostrarPanel('nueva')">Nueva inscripción</button>
+      <button class="btn btn-danger" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- PANEL INICIO -->
+    <div id="panelInicio" class="card">
+      <h2>Inicio</h2>
+      <p>Bienvenido a Kairo CRM - Gestión de alumnos.</p>
+      <div class="row">
+        <div class="col card">
+          <h3>Resumen</h3>
+          <p><span class="label">Alumnos totales:</span> <span id="resAlumnos">0</span></p>
+          <p><span class="label">Facturas pendientes:</span> <span id="resPendientes">0</span></p>
+          <p><span class="label">Facturas pagadas:</span> <span id="resPagadas">0</span></p>
+        </div>
+        <div class="col card">
+          <h3>Accesos rápidos</h3>
+          <button class="btn btn-primary" onclick="mostrarPanel('buscar')">Buscar alumnos</button><br><br>
+          <button class="btn btn-success" onclick="mostrarPanel('nueva')">Nueva inscripción</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL BUSCAR -->
+    <div id="panelBuscar" class="card" style="display:none;">
+      <h2>Buscar alumnos</h2>
+      <div class="row">
+        <div class="col">
+          <label>Buscar por nombre o ID</label><br>
+          <input id="busquedaAlumno" placeholder="Ej: Juan, ALU-123"><br><br>
+          <button class="btn btn-primary" onclick="buscarAlumno()">Buscar</button>
+        </div>
+      </div>
+      <br>
+      <div id="resultadoBusqueda"></div>
+    </div>
+
+    <!-- PANEL NUEVA INSCRIPCIÓN -->
+    <div id="panelNueva" class="card" style="display:none;">
+      <h2>Nueva inscripción</h2>
+      <div class="row">
+        <div class="col">
+          <label>Nombre del alumno</label><br>
+          <input id="nuevoNombre"><br><br>
+          <label>Email</label><br>
+          <input id="nuevoEmail"><br><br>
+          <label>Curso</label><br>
+          <input id="nuevoCurso" placeholder="Ej: Reparación de PC"><br><br>
+          <label>Monto mensual</label><br>
+          <input id="nuevoMonto" placeholder="Ej: 20000"><br><br>
+          <button class="btn btn-success" onclick="crearAlumno()">Guardar alumno</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <script>
 // -------------------------------------------------------------
-// 🔐 CREDENCIALES DE MERCADO PAGO (PEGAR LAS REALES)
+// LOGIN SIMPLE
 // -------------------------------------------------------------
-const MP_PUBLIC_KEY = "APP_USR-24e13e97-3f85-4a5b-a859-478a1b9ef88d"; 
+function login() {
+  const u = document.getElementById('loginUser').value;
+  const p = document.getElementById('loginPass').value;
+  if (u === 'admin' && p === '1234') {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    actualizarResumen();
+  } else {
+    alert('Usuario o contraseña incorrectos (usa admin / 1234)');
+  }
+}
+
+function logout() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+
+// -------------------------------------------------------------
+// NAVEGACIÓN ENTRE PANELES
+// -------------------------------------------------------------
+function mostrarPanel(panel) {
+  document.getElementById('panelInicio').style.display = 'none';
+  document.getElementById('panelBuscar').style.display = 'none';
+  document.getElementById('panelNueva').style.display = 'none';
+
+  if (panel === 'inicio') document.getElementById('panelInicio').style.display = 'block';
+  if (panel === 'buscar') document.getElementById('panelBuscar').style.display = 'block';
+  if (panel === 'nueva') document.getElementById('panelNueva').style.display = 'block';
+
+  if (panel === 'inicio') actualizarResumen();
+}
+
+// -------------------------------------------------------------
+// 🔐 CREDENCIALES MERCADO PAGO (PEGÁ LAS REALES AQUÍ)
+// -------------------------------------------------------------
+const MP_PUBLIC_KEY = "APP_USR-24e13e97-3f85-4a5b-a859-478a1b9ef88d";
 const MP_ACCESS_TOKEN = "APP_USR-3385521442823122-031511-3a833bdaafe97ed820f896519f5e77c0-306613517";
 
 // -------------------------------------------------------------
-// 🛡️ LOGO DE KAIRO (BASE64) — YA CONVERTIDO
+// LOGO KAIRO (BASE64) – PEGAR VALOR COMPLETO AQUÍ
 // -------------------------------------------------------------
-const KAIRO_LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAJYCAYAAABt0Ax7AAAACXBIWXMAAAsTAAALEwEAmpwYAAAgAElEQVR4nOzdZ3hU1f7/8c+5M7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7
+const KAIRO_LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAJYCAYAAABt0Ax7AAAACXBIWXMAAAsTAAALEwEAmpwYAAAgAElEQVR4nOzdZ3hU1f7/8c+5M7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO";
 
 // -------------------------------------------------------------
-// 📌 BASE DE DATOS LOCAL (localStorage)
+// BASE DE DATOS LOCAL
 // -------------------------------------------------------------
-let alumnos = JSON.parse(localStorage.getItem("alumnos")) || [];
+let alumnos = JSON.parse(localStorage.getItem('alumnos_kairo')) || [];
+
+function guardarAlumnos() {
+  localStorage.setItem('alumnos_kairo', JSON.stringify(alumnos));
+}
 
 // -------------------------------------------------------------
-// ➕ CREAR ALUMNO
+// CREAR ALUMNO (NUEVA INSCRIPCIÓN)
 // -------------------------------------------------------------
 async function crearAlumno() {
-    const nombre = document.getElementById("nombre").value;
-    const email = document.getElementById("email").value;
-    const monto = parseFloat(document.getElementById("monto").value);
+  const nombre = document.getElementById('nuevoNombre').value.trim();
+  const email = document.getElementById('nuevoEmail').value.trim();
+  const curso = document.getElementById('nuevoCurso').value.trim();
+  const monto = parseFloat(document.getElementById('nuevoMonto').value);
 
-    if (!nombre || !email || !monto) {
-        alert("Completá todos los campos");
-        return;
-    }
+  if (!nombre || !email || !curso || !monto) {
+    alert('Completá todos los campos');
+    return;
+  }
 
-    const id = "ALU-" + Date.now();
+  const id = "ALU-" + Date.now();
 
-    const qrURL = await generarQR(id, nombre, email, monto);
+  const qrURL = await generarQR(id, nombre, email, monto);
 
-    const alumno = {
-        id,
-        nombre,
-        email,
-        monto,
-        qr: qrURL,
-        facturas: []
-    };
+  const alumno = {
+    id,
+    nombre,
+    email,
+    curso,
+    monto,
+    qr: qrURL,
+    facturas: []
+  };
 
-    alumno.facturas.push(generarFactura(alumno));
+  alumno.facturas.push(generarFactura(alumno));
 
-    alumnos.push(alumno);
-    guardar();
-    mostrarAlumnos();
+  alumnos.push(alumno);
+  guardarAlumnos();
+  alert('Alumno creado correctamente');
+  limpiarNuevaInscripcion();
+  actualizarResumen();
+}
+
+function limpiarNuevaInscripcion() {
+  document.getElementById('nuevoNombre').value = "";
+  document.getElementById('nuevoEmail').value = "";
+  document.getElementById('nuevoCurso').value = "";
+  document.getElementById('nuevoMonto').value = "";
 }
 
 // -------------------------------------------------------------
-// 🧾 GENERAR FACTURA
+// GENERAR FACTURA MENSUAL
 // -------------------------------------------------------------
 function generarFactura(alumno) {
-    const hoy = new Date();
-    const mes = hoy.getMonth() + 1;
-    const año = hoy.getFullYear();
+  const hoy = new Date();
+  const mes = hoy.getMonth() + 1;
+  const año = hoy.getFullYear();
 
-    return {
-        numero: `FAC-${año}-${mes}-${alumno.id}`,
-        emision: `${año}-${mes}-01`,
-        vencimiento: `${año}-${mes}-12`,
-        estado: "Pendiente",
-        qr: alumno.qr
-    };
+  return {
+    numero: `FAC-${año}-${mes}-${alumno.id}`,
+    emision: `${año}-${mes}-01`,
+    vencimiento: `${año}-${mes}-12`,
+    estado: "Pendiente",
+    qr: alumno.qr
+  };
 }
 
 // -------------------------------------------------------------
-// 💾 GUARDAR EN LOCALSTORAGE
+// RESUMEN INICIO
 // -------------------------------------------------------------
-function guardar() {
-    localStorage.setItem("alumnos", JSON.stringify(alumnos));
-}
+function actualizarResumen() {
+  let totalAlumnos = alumnos.length;
+  let pendientes = 0;
+  let pagadas = 0;
 
-// -------------------------------------------------------------
-// 📋 MOSTRAR ALUMNOS
-// -------------------------------------------------------------
-function mostrarAlumnos() {
-    const div = document.getElementById("listaAlumnos");
-    div.innerHTML = "";
-
-    alumnos.forEach(a => {
-        div.innerHTML += `
-            <div class="card">
-                <h3>${a.nombre} (${a.id})</h3>
-                <p>Email: ${a.email}</p>
-                <p>Monto: $${a.monto}</p>
-                <button class="btn-success" onclick="descargarFactura('${a.id}')">Descargar factura PDF</button>
-                <button class="btn-danger" onclick="marcarPagado('${a.id}')">Marcar como pagado</button>
-            </div>
-        `;
+  alumnos.forEach(a => {
+    a.facturas.forEach(f => {
+      if (f.estado === 'Pendiente') pendientes++;
+      if (f.estado === 'Pagada') pagadas++;
     });
+  });
+
+  document.getElementById('resAlumnos').innerText = totalAlumnos;
+  document.getElementById('resPendientes').innerText = pendientes;
+  document.getElementById('resPagadas').innerText = pagadas;
 }
 
-mostrarAlumnos();
+// -------------------------------------------------------------
+// BUSCAR ALUMNO
+// -------------------------------------------------------------
+function buscarAlumno() {
+  const q = document.getElementById('busquedaAlumno').value.trim().toLowerCase();
+  const cont = document.getElementById('resultadoBusqueda');
+  cont.innerHTML = "";
+
+  if (!q) {
+    cont.innerHTML = "<p>Ingresá un nombre o ID para buscar.</p>";
+    return;
+  }
+
+  const resultados = alumnos.filter(a =>
+    a.nombre.toLowerCase().includes(q) || a.id.toLowerCase().includes(q)
+  );
+
+  if (resultados.length === 0) {
+    cont.innerHTML = "<p>No se encontraron alumnos.</p>";
+    return;
+  }
+
+  resultados.forEach(a => {
+    const factura = a.facturas[0];
+    cont.innerHTML += `
+      <div class="card">
+        <h3>${a.nombre} (${a.id})</h3>
+        <p><span class="label">Email:</span> ${a.email}</p>
+        <p><span class="label">Curso:</span> ${a.curso}</p>
+        <p><span class="label">Monto mensual:</span> $${a.monto}</p>
+        <p><span class="label">Factura actual:</span> ${factura.numero}</p>
+        <p><span class="label">Estado:</span> ${factura.estado}${factura.fechaPago ? " (pagada el " + factura.fechaPago + ")" : ""}</p>
+        <button class="btn btn-success" onclick="descargarFactura('${a.id}')">Descargar factura PDF</button>
+        <button class="btn btn-danger" onclick="marcarPagado('${a.id}')">Marcar como pagado</button>
+      </div>
+    `;
+  });
+}
 
 // -------------------------------------------------------------
-// 🟦 GENERAR QR DINÁMICO (Mercado Pago)
+// MERCADO PAGO – GENERAR PREFERENCIA (QR)
 // -------------------------------------------------------------
 async function generarQR(id, nombre, email, monto) {
-    const body = {
-        items: [
-            {
-                title: `Pago mensual - ${nombre}`,
-                quantity: 1,
-                unit_price: monto
-            }
-        ],
-        external_reference: id,
-        payer: { name: nombre, email: email }
-    };
+  const body = {
+    items: [
+      {
+        title: `Pago mensual - ${nombre}`,
+        quantity: 1,
+        unit_price: monto
+      }
+    ],
+    external_reference: id,
+    payer: { name: nombre, email: email }
+  };
 
-    const res = await fetch("https://api.mercadopago.com/checkout/preferences", {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${MP_ACCESS_TOKEN}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-    });
+  const res = await fetch("https://api.mercadopago.com/checkout/preferences", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${MP_ACCESS_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
 
-    const data = await res.json();
-    return data.init_point;
+  const data = await res.json();
+  return data.init_point; // URL que usamos para el QR
 }
 
 // -------------------------------------------------------------
-// 📄 DESCARGAR FACTURA PDF
+// DESCARGAR FACTURA PDF
 // -------------------------------------------------------------
 async function descargarFactura(id) {
-    const alumno = alumnos.find(a => a.id === id);
-    const factura = alumno.facturas[0];
+  const alumno = alumnos.find(a => a.id === id);
+  if (!alumno) return;
+  const factura = alumno.facturas[0];
 
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF();
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
 
+  // Logo
+  if (KAIRO_LOGO_BASE64 !== "PEGAR_AQUI_LOGO_BASE64") {
     pdf.addImage(KAIRO_LOGO_BASE64, "PNG", 10, 10, 40, 40);
+  }
 
-    pdf.setFontSize(18);
-    pdf.text("Factura Kairo", 70, 20);
+  pdf.setFontSize(18);
+  pdf.text("Factura Kairo", 70, 20);
 
-    pdf.setFontSize(12);
-    pdf.text(`Alumno: ${alumno.nombre}`, 10, 60);
-    pdf.text(`ID: ${alumno.id}`, 10, 70);
-    pdf.text(`Factura: ${factura.numero}`, 10, 80);
-    pdf.text(`Monto: $${alumno.monto}`, 10, 90);
-    pdf.text(`Emisión: ${factura.emision}`, 10, 100);
-    pdf.text(`Vencimiento: ${factura.vencimiento}`, 10, 110);
+  pdf.setFontSize(12);
+  pdf.text(`Alumno: ${alumno.nombre}`, 10, 60);
+  pdf.text(`ID: ${alumno.id}`, 10, 70);
+  pdf.text(`Curso: ${alumno.curso}`, 10, 80);
+  pdf.text(`Factura: ${factura.numero}`, 10, 90);
+  pdf.text(`Monto: $${alumno.monto}`, 10, 100);
+  pdf.text(`Emisión: ${factura.emision}`, 10, 110);
+  pdf.text(`Vencimiento: ${factura.vencimiento}`, 10, 120);
 
-    // Generar QR como imagen
-    const qr = new QRious({ value: factura.qr, size: 200 });
-    pdf.addImage(qr.toDataURL(), "PNG", 10, 130, 80, 80);
+  // QR
+  const qr = new QRious({ value: factura.qr, size: 200 });
+  pdf.text("Escaneá para pagar:", 10, 135);
+  pdf.addImage(qr.toDataURL(), "PNG", 10, 140, 60, 60);
 
-    pdf.save(`Factura-${factura.numero}.pdf`);
+  pdf.save(`Factura-${factura.numero}.pdf`);
 }
 
 // -------------------------------------------------------------
-// ✔️ MARCAR COMO PAGADO
+// MARCAR FACTURA COMO PAGADA
 // -------------------------------------------------------------
 function marcarPagado(id) {
-    const alumno = alumnos.find(a => a.id === id);
-    alumno.facturas[0].estado = "Pagada";
-    alumno.facturas[0].fechaPago = new Date().toISOString().split("T")[0];
-    guardar();
-    mostrarAlumnos();
+  const alumno = alumnos.find(a => a.id === id);
+  if (!alumno) return;
+  const factura = alumno.facturas[0];
+  factura.estado = "Pagada";
+  factura.fechaPago = new Date().toISOString().split("T")[0];
+  guardarAlumnos();
+  actualizarResumen();
+  buscarAlumno();
+  alert('Factura marcada como pagada');
 }
 </script>
 
