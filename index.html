@@ -1,0 +1,495 @@
+!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<title>CRM Instituto</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body{
+background:#f5f7fb;
+font-family:Arial;
+}
+
+.sidebar{
+width:230px;
+height:100vh;
+background:#1e293b;
+position:fixed;
+color:white;
+padding:20px;
+}
+
+.sidebar h4{
+margin-bottom:30px;
+}
+
+.sidebar button{
+width:100%;
+margin-bottom:10px;
+}
+
+.main{
+margin-left:250px;
+padding:40px;
+}
+
+.card{
+border:none;
+box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+.step{
+display:flex;
+gap:10px;
+margin-bottom:30px;
+}
+
+.step div{
+padding:8px 15px;
+background:#e5e7eb;
+border-radius:20px;
+}
+
+.step .active{
+background:#2563eb;
+color:white;
+}
+
+.hidden{
+display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- LOGIN -->
+
+<div id="login" class="container mt-5">
+
+<div class="card p-4 mx-auto" style="max-width:400px">
+
+<h4>Login CRM</h4>
+
+<input id="user" class="form-control mb-2" placeholder="Usuario">
+
+<input id="pass" type="password" class="form-control mb-3" placeholder="Contraseña">
+
+<button class="btn btn-primary w-100" onclick="login()">Ingresar</button>
+
+</div>
+
+</div>
+
+<!-- CRM -->
+
+<div id="crm" class="hidden">
+
+<div class="sidebar">
+
+<h4>CRM</h4>
+
+<button class="btn btn-light" onclick="dashboard()">Dashboard</button>
+
+<button class="btn btn-success" onclick="nuevaVenta()">Nueva venta</button>
+
+<button class="btn btn-primary" onclick="verAlumnos()">Buscar alumnos</button>
+
+</div>
+
+<div class="main">
+
+<!-- DASHBOARD -->
+
+<div id="panel">
+
+<div class="card p-4">
+
+<h4>Panel del CRM</h4>
+
+<p>Bienvenido al sistema del instituto</p>
+
+</div>
+
+</div>
+
+<!-- WIZARD -->
+
+<div id="wizard" class="hidden">
+
+<div class="step">
+
+<div id="s1" class="active">Datos</div>
+<div id="s2">Curso</div>
+<div id="s3">Promo</div>
+<div id="s4">Pago</div>
+<div id="s5">Confirmación</div>
+
+</div>
+
+<div class="card p-4" id="contenido"></div>
+
+</div>
+
+<!-- ALUMNOS -->
+
+<div id="alumnos" class="hidden">
+
+<div class="card p-4">
+
+<h4>Alumnos</h4>
+
+<input id="buscar" class="form-control mb-3" placeholder="Buscar alumno..." onkeyup="buscar()">
+
+<table class="table">
+
+<thead>
+
+<tr>
+<th>ID</th>
+<th>Nombre</th>
+<th>Curso</th>
+<th>Estado</th>
+</tr>
+
+</thead>
+
+<tbody id="tabla"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let usuarios=[
+
+{user:"admin",pass:"1234"},
+{user:"ventas",pass:"1234"}
+
+]
+
+let alumnos=JSON.parse(localStorage.getItem("alumnos"))||[]
+
+let paso=1
+
+let venta={}
+
+function login(){
+
+let u=document.getElementById("user").value
+let p=document.getElementById("pass").value
+
+let ok=usuarios.find(x=>x.user===u && x.pass===p)
+
+if(ok){
+
+document.getElementById("login").style.display="none"
+document.getElementById("crm").classList.remove("hidden")
+
+}
+
+}
+
+function dashboard(){
+
+ocultarTodo()
+
+document.getElementById("panel").classList.remove("hidden")
+
+}
+
+function nuevaVenta(){
+
+ocultarTodo()
+
+document.getElementById("wizard").classList.remove("hidden")
+
+paso=1
+
+mostrarPaso()
+
+}
+
+function verAlumnos(){
+
+ocultarTodo()
+
+document.getElementById("alumnos").classList.remove("hidden")
+
+render()
+
+}
+
+function ocultarTodo(){
+
+document.querySelectorAll("#panel,#wizard,#alumnos").forEach(x=>x.classList.add("hidden"))
+
+}
+
+function mostrarPaso(){
+
+let c=document.getElementById("contenido")
+
+if(paso===1){
+
+c.innerHTML=`
+
+<h5>Datos personales</h5>
+
+<input id="nombre" class="form-control mb-2" placeholder="Nombre">
+
+<input id="apellido" class="form-control mb-2" placeholder="Apellido">
+
+<input id="dni" class="form-control mb-2" placeholder="DNI">
+
+<button class="btn btn-primary" onclick="guardarDatos()">Siguiente</button>
+
+`
+
+}
+
+if(paso===2){
+
+c.innerHTML=`
+
+<h5>Curso</h5>
+
+<select id="curso" class="form-select mb-2" onchange="precio()">
+
+<option value="">Curso</option>
+<option value="idioma">Idioma</option>
+<option value="office">Office</option>
+<option value="tecnico">Reparación PC</option>
+
+</select>
+
+<div id="carrito"></div>
+
+<button class="btn btn-primary mt-2" onclick="siguiente()">Siguiente</button>
+
+`
+
+}
+
+if(paso===3){
+
+c.innerHTML=`
+
+<h5>Promoción</h5>
+
+<select id="promo" class="form-select mb-2" onchange="precioPromo()">
+
+<option value="0">Sin promo</option>
+<option value="25">25%</option>
+<option value="30">30%</option>
+<option value="50">50%</option>
+<option value="10">Idioma 10%</option>
+
+</select>
+
+<div id="promoPrecio"></div>
+
+<button class="btn btn-primary mt-2" onclick="siguiente()">Siguiente</button>
+
+`
+
+}
+
+if(paso===4){
+
+c.innerHTML=`
+
+<h5>Pago</h5>
+
+<select id="pago" class="form-select mb-2" onchange="comprobante()">
+
+<option>No pagó</option>
+<option>Pagó</option>
+
+</select>
+
+<div id="comp" class="hidden">
+
+<input type="file" class="form-control">
+
+</div>
+
+<button class="btn btn-success mt-2" onclick="finalizar()">Finalizar</button>
+
+`
+
+}
+
+}
+
+function guardarDatos(){
+
+venta.nombre=document.getElementById("nombre").value
+venta.apellido=document.getElementById("apellido").value
+venta.dni=document.getElementById("dni").value
+
+siguiente()
+
+}
+
+function siguiente(){
+
+paso++
+
+document.querySelectorAll(".step div").forEach(x=>x.classList.remove("active"))
+
+document.getElementById("s"+paso).classList.add("active")
+
+mostrarPaso()
+
+}
+
+function precio(){
+
+let curso=document.getElementById("curso").value
+
+let ins=0
+let men=0
+
+if(curso==="idioma"){ins=20;men=20}
+if(curso==="office"){ins=7;men=10}
+if(curso==="tecnico"){ins=10;men=15}
+
+venta.curso=curso
+venta.ins=ins
+venta.men=men
+
+document.getElementById("carrito").innerHTML=
+
+Inscripción: USD ${ins} <br> Cuota mensual: USD ${men}
+
+}
+
+function precioPromo(){
+
+let promo=parseInt(document.getElementById("promo").value)
+
+let total=venta.men
+
+if(venta.curso==="idioma" && promo===10){
+
+total=total*0.9
+
+}else{
+
+total=total*(1-promo/100)
+
+}
+
+venta.total=total
+
+document.getElementById("promoPrecio").innerHTML=
+
+Cuota con promo: USD ${total.toFixed(2)}
+
+}
+
+function comprobante(){
+
+if(document.getElementById("pago").value==="Pagó"){
+
+document.getElementById("comp").classList.remove("hidden")
+
+}else{
+
+document.getElementById("comp").classList.add("hidden")
+
+}
+
+}
+
+function generarID(){
+
+return "ALU-"+Math.floor(Math.random()*100000)
+
+}
+
+function generarGestion(){
+
+return "GEST-"+Date.now()
+
+}
+
+function finalizar(){
+
+venta.id=generarID()
+venta.gestion=generarGestion()
+
+venta.estado=document.getElementById("pago").value==="Pagó"?"Activo":"Inactivo"
+
+alumnos.push(venta)
+
+localStorage.setItem("alumnos",JSON.stringify(alumnos))
+
+document.getElementById("contenido").innerHTML=
+
+`<h4>Alumno registrado</h4>
+
+<p>ID alumno: ${venta.id}</p>
+
+<p>Número gestión: ${venta.gestion}</p>
+
+<button class="btn btn-primary" onclick="dashboard()">Volver</button>`
+
+}
+
+function render(){
+
+let tabla=document.getElementById("tabla")
+
+tabla.innerHTML=""
+
+alumnos.forEach(a=>{
+
+tabla.innerHTML+=`
+
+<tr>
+
+<td>${a.id}</td>
+<td>${a.nombre}</td>
+<td>${a.curso}</td>
+<td>${a.estado}</td>
+
+</tr>
+
+`
+
+})
+
+}
+
+function buscar(){
+
+let filtro=document.getElementById("buscar").value.toLowerCase()
+
+document.querySelectorAll("#tabla tr").forEach(f=>{
+
+f.style.display=f.innerText.toLowerCase().includes(filtro)?"":"none"
+
+})
+
+}
+
+</script>
+
+</body>
+</html>
