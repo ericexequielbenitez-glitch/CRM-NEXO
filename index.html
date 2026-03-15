@@ -132,8 +132,8 @@
 </div>
 
 <script>
-// CONFIG
-const URL_WEBAPP_VENDEDORES = "https://script.google.com/macros/s/AKfycbwnwXIm-i_jV0HUAVKfDxA7THzqk7RwjNLylOoAiwYB8DF7XDcPizW0SUq8r2-Va2vibg/exec";
+// URLs de tus WebApps
+const URL_WEBAPP_VENDEDORES = "https://script.google.com/macros/s/AKfycbzMriPxkXqfrucbuawISp3fgj52k8eumclxmeNdNYg0ti_WGHdZYd433zdZHPYtRSBuOg/exec";
 const URL_WEBAPP_ALUMNOS   = "https://script.google.com/macros/s/AKfycbxY0mIsK2MOWTimfLw5uHrvnCTol4lhQDzOpReTt8126-3chAwv5L_0Y16WYkaU43iK/exec";
 
 // LOGIN
@@ -152,6 +152,7 @@ async function login() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ legajo, pass })
     });
+
     const data = await res.json();
 
     if (!data.ok) {
@@ -240,7 +241,6 @@ function toggleCurso(i) {
 }
 
 function actualizarTotal() {
-  const meses = parseInt(document.getElementById("duracion").value);
   const totalMensual = carrito.reduce((acc, c) => acc + c.precio, 0);
   document.getElementById("totalMostrar").innerText = "$" + totalMensual;
 }
@@ -253,8 +253,8 @@ async function crearAlumno() {
   const provincia = document.getElementById("nuevoProvincia").value;
   const dni       = document.getElementById("nuevoDni").value.trim();
   const estado    = document.getElementById("nuevoEstado").value;
-  const meses     = parseInt(document.getElementById("duracion").value);
   const montoMensual = carrito.reduce((acc, c) => acc + c.precio, 0);
+  const duracion  = parseInt(document.getElementById("duracion").value);
 
   if (!nombre || !email || !dni || carrito.length === 0) {
     alert("Completá todos los datos y elegí al menos un curso");
@@ -282,7 +282,7 @@ async function crearAlumno() {
     dni,
     cursos: carrito.map(c => ({ nombre: c.nombre, precio: c.precio })),
     montoMensual,
-    duracion: meses,
+    duracion,
     estado,
     vendedorLegajo,
     vendedorNombre
