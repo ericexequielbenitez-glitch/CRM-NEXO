@@ -92,7 +92,7 @@
     }
 
     .sidebar {
-        width: 240px;
+        width: 260px;
         background: #111;
         padding: 20px;
         display: flex;
@@ -267,6 +267,56 @@
         color: #aaa;
     }
 
+    /* FORM ALTA ALUMNO */
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px 15px;
+        margin-top: 10px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+        color: #ccc;
+        display: block;
+        margin-bottom: 3px;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 8px;
+        border-radius: 8px;
+        border: none;
+        font-size: 13px;
+        outline: none;
+    }
+
+    .btn-primary {
+        padding: 9px 14px;
+        border-radius: 8px;
+        border: none;
+        background: #ffcc00;
+        color: #000;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    .btn-primary:hover {
+        background: #e6b800;
+    }
+
+    .msg {
+        font-size: 12px;
+        margin-top: 5px;
+        display: none;
+    }
+
+    .msg.error { color: #ff4d4d; }
+    .msg.ok { color: #4dff4d; }
+
     /* Modal MP */
     .modal-bg {
         position: fixed;
@@ -313,17 +363,6 @@
         margin-top: 10px;
     }
 
-    .btn-primary {
-        flex: 1;
-        padding: 9px;
-        border-radius: 8px;
-        border: none;
-        background: #ffcc00;
-        color: #000;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
     .btn-secondary {
         flex: 1;
         padding: 9px;
@@ -342,15 +381,6 @@
         font-size: 11px;
         word-break: break-all;
     }
-
-    .msg {
-        font-size: 12px;
-        margin-top: 5px;
-        display: none;
-    }
-
-    .msg.error { color: #ff4d4d; }
-    .msg.ok { color: #4dff4d; }
 </style>
 </head>
 <body>
@@ -377,6 +407,7 @@
         <h3>Menú</h3>
         <div class="menu">
             <button class="active" onclick="mostrarSeccion('dashboard')">Dashboard</button>
+            <button onclick="mostrarSeccion('alta')">Alta de alumnos</button>
             <button onclick="mostrarSeccion('alumnos')">Alumnos</button>
             <button onclick="mostrarSeccion('historial')">Historial de pagos</button>
             <button onclick="abrirModalMP()">Mercado Pago</button>
@@ -427,6 +458,87 @@
                     Acá ves un resumen de tus alumnos, facturación y ventas.  
                     Más abajo podés entrar al detalle de alumnos y pagos.
                 </p>
+            </div>
+        </div>
+
+        <!-- ALTA DE ALUMNOS -->
+        <div id="seccion-alta" style="display:none;">
+            <div class="section">
+                <h2>Alta de alumno</h2>
+                <p class="small">Completá los datos del alumno. Provincia y ciudad incluidas.</p>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nombre y apellido</label>
+                        <input type="text" id="altaNombre">
+                    </div>
+                    <div class="form-group">
+                        <label>DNI</label>
+                        <input type="text" id="altaDni">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="altaEmail">
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="text" id="altaTelefono">
+                    </div>
+                    <div class="form-group">
+                        <label>Provincia</label>
+                        <select id="altaProvincia">
+                            <option value="">Seleccionar...</option>
+                            <option>Buenos Aires</option>
+                            <option>CABA</option>
+                            <option>Catamarca</option>
+                            <option>Chaco</option>
+                            <option>Chubut</option>
+                            <option>Córdoba</option>
+                            <option>Corrientes</option>
+                            <option>Entre Ríos</option>
+                            <option>Formosa</option>
+                            <option>Jujuy</option>
+                            <option>La Pampa</option>
+                            <option>La Rioja</option>
+                            <option>Mendoza</option>
+                            <option>Misiones</option>
+                            <option>Neuquén</option>
+                            <option>Río Negro</option>
+                            <option>Salta</option>
+                            <option>San Juan</option>
+                            <option>San Luis</option>
+                            <option>Santa Cruz</option>
+                            <option>Santa Fe</option>
+                            <option>Santiago del Estero</option>
+                            <option>Tierra del Fuego</option>
+                            <option>Tucumán</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ciudad</label>
+                        <input type="text" id="altaCiudad">
+                    </div>
+                    <div class="form-group">
+                        <label>Curso</label>
+                        <input type="text" id="altaCurso">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de inicio</label>
+                        <input type="date" id="altaFechaInicio">
+                    </div>
+                    <div class="form-group">
+                        <label>Meses contratados</label>
+                        <input type="number" id="altaMeses" min="1" value="6">
+                    </div>
+                    <div class="form-group">
+                        <label>Monto mensual</label>
+                        <input type="number" id="altaMonto" min="0">
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="registrarAlumno()">Registrar alumno</button>
+                <div id="altaMsgOk" class="msg ok"></div>
+                <div id="altaMsgError" class="msg error"></div>
             </div>
         </div>
 
@@ -505,7 +617,8 @@
 </div>
 
 <script>
-const WEBAPP_URL = "TU_URL_WEBAPP_AQUI"; // poné acá la URL del WebApp
+// URL DEL WEBAPP
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbweOaQtXHyuKWnft2ziaTDcE0ykkJd-F5rGsTQM1IV_X4FdrbUdt-doat5k3S1ZjLJtQw/exec";
 
 let legajo = null;
 let nombreVendedor = null;
@@ -513,7 +626,6 @@ let nombreVendedor = null;
 /* INICIO */
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Si ya hay sesión, ir directo al panel
     const leg = localStorage.getItem("legajo");
     const nom = localStorage.getItem("nombre");
 
@@ -606,14 +718,16 @@ function mostrarSeccion(seccion) {
     document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
     const botones = {
         dashboard: 0,
-        alumnos: 1,
-        historial: 2
+        alta: 1,
+        alumnos: 2,
+        historial: 3
     };
     if (botones[seccion] !== undefined) {
         document.querySelectorAll(".menu button")[botones[seccion]].classList.add("active");
     }
 
     document.getElementById("seccion-dashboard").style.display = "none";
+    document.getElementById("seccion-alta").style.display = "none";
     document.getElementById("seccion-alumnos").style.display = "none";
     document.getElementById("seccion-historial").style.display = "none";
 
@@ -643,6 +757,84 @@ async function cargarDashboard() {
         document.getElementById("cardMonto").innerText     = "$ " + r.montoVentas;
     } catch (e) {
         console.error(e);
+    }
+}
+
+/* ALTA DE ALUMNOS */
+
+async function registrarAlumno() {
+    const nombre   = document.getElementById("altaNombre").value.trim();
+    const dni      = document.getElementById("altaDni").value.trim();
+    const email    = document.getElementById("altaEmail").value.trim();
+    const tel      = document.getElementById("altaTelefono").value.trim();
+    const prov     = document.getElementById("altaProvincia").value;
+    const ciudad   = document.getElementById("altaCiudad").value.trim();
+    const curso    = document.getElementById("altaCurso").value.trim();
+    const fechaIni = document.getElementById("altaFechaInicio").value;
+    const meses    = document.getElementById("altaMeses").value;
+    const monto    = document.getElementById("altaMonto").value;
+
+    const msgOk    = document.getElementById("altaMsgOk");
+    const msgError = document.getElementById("altaMsgError");
+
+    msgOk.style.display = "none";
+    msgError.style.display = "none";
+
+    if (!nombre || !dni || !email || !prov || !ciudad || !curso || !fechaIni || !meses || !monto) {
+        msgError.innerText = "Completá todos los campos.";
+        msgError.style.display = "block";
+        return;
+    }
+
+    try {
+        const resp = await fetch(WEBAPP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                accion: "registrarAlumno",
+                legajo,
+                nombre,
+                dni,
+                email,
+                telefono: tel,
+                provincia: prov,
+                ciudad,
+                curso,
+                fechaInicio: fechaIni,
+                mesesContratados: Number(meses),
+                montoMensual: Number(monto)
+            })
+        });
+
+        const data = await resp.json();
+
+        if (!data.ok) {
+            msgError.innerText = data.error || "No se pudo registrar el alumno.";
+            msgError.style.display = "block";
+            return;
+        }
+
+        msgOk.innerText = "Alumno registrado correctamente.";
+        msgOk.style.display = "block";
+
+        // limpiar
+        document.getElementById("altaNombre").value = "";
+        document.getElementById("altaDni").value = "";
+        document.getElementById("altaEmail").value = "";
+        document.getElementById("altaTelefono").value = "";
+        document.getElementById("altaProvincia").value = "";
+        document.getElementById("altaCiudad").value = "";
+        document.getElementById("altaCurso").value = "";
+        document.getElementById("altaFechaInicio").value = "";
+        document.getElementById("altaMeses").value = "6";
+        document.getElementById("altaMonto").value = "";
+
+        cargarAlumnos();
+
+    } catch (e) {
+        console.error(e);
+        msgError.innerText = "Error de conexión con el servidor.";
+        msgError.style.display = "block";
     }
 }
 
@@ -813,4 +1005,3 @@ async function generarLinkMP() {
 
 </body>
 </html>
-
