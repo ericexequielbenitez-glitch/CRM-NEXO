@@ -1,6 +1,5 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
-
 <head>
 
 <meta charset="UTF-8">
@@ -16,16 +15,12 @@ font-family:Arial;
 }
 
 .sidebar{
-width:230px;
+width:220px;
 height:100vh;
 background:#1e293b;
 position:fixed;
 color:white;
 padding:20px;
-}
-
-.sidebar h4{
-margin-bottom:30px;
 }
 
 .sidebar button{
@@ -34,7 +29,7 @@ margin-bottom:10px;
 }
 
 .main{
-margin-left:250px;
+margin-left:240px;
 padding:40px;
 }
 
@@ -43,25 +38,25 @@ border:none;
 box-shadow:0 4px 12px rgba(0,0,0,0.08);
 }
 
+.hidden{
+display:none;
+}
+
 .step{
 display:flex;
 gap:10px;
-margin-bottom:30px;
+margin-bottom:25px;
 }
 
 .step div{
-padding:8px 15px;
+padding:6px 12px;
 background:#e5e7eb;
 border-radius:20px;
 }
 
-.step .active{
+.active{
 background:#2563eb;
 color:white;
-}
-
-.hidden{
-display:none;
 }
 
 </style>
@@ -112,9 +107,9 @@ display:none;
 
 <div class="card p-4">
 
-<h4>Panel del CRM</h4>
+<h4>Panel</h4>
 
-<p>Bienvenido al sistema del instituto</p>
+<p>Bienvenido al CRM del instituto</p>
 
 </div>
 
@@ -130,7 +125,7 @@ display:none;
 <div id="s2">Curso</div>
 <div id="s3">Promo</div>
 <div id="s4">Pago</div>
-<div id="s5">Confirmación</div>
+<div id="s5">Final</div>
 
 </div>
 
@@ -146,7 +141,7 @@ display:none;
 
 <h4>Alumnos</h4>
 
-<input id="buscar" class="form-control mb-3" placeholder="Buscar alumno..." onkeyup="buscar()">
+<input id="buscar" class="form-control mb-3" placeholder="Buscar..." onkeyup="buscar()">
 
 <table class="table">
 
@@ -176,22 +171,19 @@ display:none;
 <script>
 
 let usuarios=[
-
 {user:"admin",pass:"1234"},
 {user:"ventas",pass:"1234"}
-
 ]
 
 let alumnos=JSON.parse(localStorage.getItem("alumnos"))||[]
 
 let paso=1
-
 let venta={}
 
 function login(){
 
-let u=document.getElementById("user").value
-let p=document.getElementById("pass").value
+let u=document.getElementById("user").value.trim()
+let p=document.getElementById("pass").value.trim()
 
 let ok=usuarios.find(x=>x.user===u && x.pass===p)
 
@@ -200,13 +192,25 @@ if(ok){
 document.getElementById("login").style.display="none"
 document.getElementById("crm").classList.remove("hidden")
 
+dashboard()
+
+}else{
+
+alert("Usuario o contraseña incorrectos")
+
 }
+
+}
+
+function ocultar(){
+
+document.querySelectorAll("#panel,#wizard,#alumnos").forEach(x=>x.classList.add("hidden"))
 
 }
 
 function dashboard(){
 
-ocultarTodo()
+ocultar()
 
 document.getElementById("panel").classList.remove("hidden")
 
@@ -214,7 +218,7 @@ document.getElementById("panel").classList.remove("hidden")
 
 function nuevaVenta(){
 
-ocultarTodo()
+ocultar()
 
 document.getElementById("wizard").classList.remove("hidden")
 
@@ -226,17 +230,11 @@ mostrarPaso()
 
 function verAlumnos(){
 
-ocultarTodo()
+ocultar()
 
 document.getElementById("alumnos").classList.remove("hidden")
 
 render()
-
-}
-
-function ocultarTodo(){
-
-document.querySelectorAll("#panel,#wizard,#alumnos").forEach(x=>x.classList.add("hidden"))
 
 }
 
@@ -256,7 +254,7 @@ c.innerHTML=`
 
 <input id="dni" class="form-control mb-2" placeholder="DNI">
 
-<button class="btn btn-primary" onclick="guardarDatos()">Siguiente</button>
+<button class="btn btn-primary mt-2" onclick="guardarDatos()">Siguiente</button>
 
 `
 
