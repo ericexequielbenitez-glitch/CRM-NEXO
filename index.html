@@ -20,15 +20,13 @@
     .btn-secondary { background:#6c757d; color:white; }
     .container { padding:20px; }
     .card { background:white; border-radius:6px; padding:15px; margin-bottom:20px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-    .card h2 { margin-top:0; font-size:18px; }
     .label { font-weight:bold; }
     input, select { padding:6px; border-radius:4px; border:1px solid #ccc; width:100%; max-width:300px; }
-    .row { display:flex; gap:20px; flex-wrap:wrap; }
-    .col { flex:1; min-width:260px; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td { border:1px solid #ddd; padding:8px; }
+    th { background:#eee; }
     #loginScreen { display:flex; height:100vh; align-items:center; justify-content:center; background:#1b4f72; }
     #loginBox { background:white; padding:25px; border-radius:8px; width:320px; box-shadow:0 2px 6px rgba(0,0,0,0.3); }
-    #loginBox h2 { margin-top:0; text-align:center; }
-    .small { font-size:12px; color:#666; }
 </style>
 </head>
 <body>
@@ -37,7 +35,6 @@
 <div id="loginScreen">
   <div id="loginBox">
     <h2>Kairo CRM</h2>
-    <p class="small">Inicio de sesión</p>
     <label>Usuario</label><br>
     <input id="loginUser" placeholder="admin"><br><br>
     <label>Contraseña</label><br>
@@ -64,51 +61,41 @@
     <div id="panelInicio" class="card">
       <h2>Inicio</h2>
       <p>Bienvenido a Kairo CRM - Gestión de alumnos.</p>
-      <div class="row">
-        <div class="col card">
-          <h3>Resumen</h3>
-          <p><span class="label">Alumnos totales:</span> <span id="resAlumnos">0</span></p>
-          <p><span class="label">Facturas pendientes:</span> <span id="resPendientes">0</span></p>
-          <p><span class="label">Facturas pagadas:</span> <span id="resPagadas">0</span></p>
-        </div>
-        <div class="col card">
-          <h3>Accesos rápidos</h3>
-          <button class="btn btn-primary" onclick="mostrarPanel('buscar')">Buscar alumnos</button><br><br>
-          <button class="btn btn-success" onclick="mostrarPanel('nueva')">Nueva inscripción</button>
-        </div>
-      </div>
+      <p><span class="label">Alumnos totales:</span> <span id="resAlumnos">0</span></p>
     </div>
 
     <!-- PANEL BUSCAR -->
     <div id="panelBuscar" class="card" style="display:none;">
       <h2>Buscar alumnos</h2>
-      <div class="row">
-        <div class="col">
-          <label>Buscar por nombre o ID</label><br>
-          <input id="busquedaAlumno" placeholder="Ej: Juan, ALU-123"><br><br>
-          <button class="btn btn-primary" onclick="buscarAlumno()">Buscar</button>
-        </div>
-      </div>
-      <br>
+      <input id="busquedaAlumno" placeholder="Ej: Juan, ALU-123">
+      <button class="btn btn-primary" onclick="buscarAlumno()">Buscar</button>
       <div id="resultadoBusqueda"></div>
     </div>
 
     <!-- PANEL NUEVA INSCRIPCIÓN -->
     <div id="panelNueva" class="card" style="display:none;">
       <h2>Nueva inscripción</h2>
-      <div class="row">
-        <div class="col">
-          <label>Nombre del alumno</label><br>
-          <input id="nuevoNombre"><br><br>
-          <label>Email</label><br>
-          <input id="nuevoEmail"><br><br>
-          <label>Curso</label><br>
-          <input id="nuevoCurso" placeholder="Ej: Reparación de PC"><br><br>
-          <label>Monto mensual</label><br>
-          <input id="nuevoMonto" placeholder="Ej: 20000"><br><br>
-          <button class="btn btn-success" onclick="crearAlumno()">Guardar alumno</button>
-        </div>
-      </div>
+
+      <label>Nombre del alumno</label>
+      <input id="nuevoNombre">
+
+      <label>Email</label>
+      <input id="nuevoEmail">
+
+      <h3>Cursos disponibles</h3>
+      <div id="listaCursos"></div>
+
+      <h3>Duración</h3>
+      <select id="duracion" onchange="actualizarTotal()">
+        <option value="1">1 mes</option>
+        <option value="3">3 meses</option>
+        <option value="6">6 meses</option>
+      </select>
+
+      <h3>Total</h3>
+      <p id="totalMostrar">$0</p>
+
+      <button class="btn btn-success" onclick="crearAlumno()">Registrar alumno</button>
     </div>
 
   </div>
@@ -117,185 +104,190 @@
 <script>
 // LOGIN
 function login() {
-  const u = document.getElementById('loginUser').value;
-  const p = document.getElementById('loginPass').value;
-  if (u === 'admin' && p === '1234') {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
+  if (loginUser.value === "admin" && loginPass.value === "1234") {
+    loginScreen.style.display = "none";
+    app.style.display = "block";
     actualizarResumen();
-  } else {
-    alert('Usuario o contraseña incorrectos (usa admin / 1234)');
-  }
+  } else alert("Credenciales incorrectas");
 }
 
 function logout() {
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'flex';
+  app.style.display = "none";
+  loginScreen.style.display = "flex";
 }
 
 // NAVEGACIÓN
-function mostrarPanel(panel) {
-  document.getElementById('panelInicio').style.display = 'none';
-  document.getElementById('panelBuscar').style.display = 'none';
-  document.getElementById('panelNueva').style.display = 'none';
-
-  if (panel === 'inicio') document.getElementById('panelInicio').style.display = 'block';
-  if (panel === 'buscar') document.getElementById('panelBuscar').style.display = 'block';
-  if (panel === 'nueva') document.getElementById('panelNueva').style.display = 'block';
-
-  if (panel === 'inicio') actualizarResumen();
+function mostrarPanel(p) {
+  panelInicio.style.display = "none";
+  panelBuscar.style.display = "none";
+  panelNueva.style.display = "none";
+  if (p === "inicio") panelInicio.style.display = "block";
+  if (p === "buscar") panelBuscar.style.display = "block";
+  if (p === "nueva") panelNueva.style.display = "block";
 }
 
-// MERCADO PAGO
-const MP_PUBLIC_KEY = "APP_USR-24e13e97-3f85-4a5b-a859-478a1b9ef88d";
-const MP_ACCESS_TOKEN = "APP_USR-3385521442823122-031511-3a833bdaafe97ed820f896519f5e77c0-306613517";
+// CURSOS
+const cursos = [
+  { nombre:"MS Word básico", precio:20000 },
+  { nombre:"MS Word intermedio", precio:20000 },
+  { nombre:"MS Word avanzado", precio:20000 },
+  { nombre:"MS Excel básico", precio:20000 },
+  { nombre:"MS Excel intermedio", precio:20000 },
+  { nombre:"MS Excel avanzado", precio:20000 },
+  { nombre:"MS Publisher básico", precio:20000 },
+  { nombre:"MS Publisher intermedio", precio:20000 },
+  { nombre:"MS Publisher avanzado", precio:20000 },
+  { nombre:"MS Access básico", precio:20000 },
+  { nombre:"MS Access intermedio", precio:20000 },
+  { nombre:"MS Access avanzado", precio:20000 },
+  { nombre:"Inglés", precio:30000 },
+  { nombre:"Francés", precio:30000 },
+  { nombre:"Portugués", precio:30000 }
+];
+
+let carrito = [];
+
+function cargarCursos() {
+  let html = "<table><tr><th>Curso</th><th>Precio</th><th>Elegir</th></tr>";
+  cursos.forEach((c, i) => {
+    html += `
+      <tr>
+        <td>${c.nombre}</td>
+        <td>$${c.precio}</td>
+        <td><input type='checkbox' onchange='toggleCurso(${i})'></td>
+      </tr>`;
+  });
+  html += "</table>";
+  document.getElementById("listaCursos").innerHTML = html;
+}
+cargarCursos();
+
+function toggleCurso(i) {
+  const curso = cursos[i];
+  const existe = carrito.find(c => c.nombre === curso.nombre);
+  if (existe) carrito = carrito.filter(c => c.nombre !== curso.nombre);
+  else carrito.push(curso);
+  actualizarTotal();
+}
+
+function actualizarTotal() {
+  const meses = parseInt(document.getElementById("duracion").value);
+  const total = carrito.reduce((acc, c) => acc + c.precio, 0) * meses;
+  document.getElementById("totalMostrar").innerText = "$" + total;
+}
 
 // BASE DE DATOS
-let alumnos = JSON.parse(localStorage.getItem('alumnos_kairo')) || [];
-
-function guardarAlumnos() {
-  localStorage.setItem('alumnos_kairo', JSON.stringify(alumnos));
-}
+let alumnos = JSON.parse(localStorage.getItem("alumnos_kairo")) || [];
+function guardar() { localStorage.setItem("alumnos_kairo", JSON.stringify(alumnos)); }
 
 // CREAR ALUMNO
 async function crearAlumno() {
-  const nombre = document.getElementById('nuevoNombre').value.trim();
-  const email = document.getElementById('nuevoEmail').value.trim();
-  const curso = document.getElementById('nuevoCurso').value.trim();
-  const monto = parseFloat(document.getElementById('nuevoMonto').value);
+  if (carrito.length === 0) return alert("Elegí al menos un curso");
+  const nombre = nuevoNombre.value.trim();
+  const email = nuevoEmail.value.trim();
+  const meses = parseInt(duracion.value);
 
-  if (!nombre || !email || !curso || !monto) {
-    alert('Completá todos los campos');
-    return;
-  }
+  if (!nombre || !email) return alert("Completá nombre y email");
 
   const id = "ALU-" + Date.now();
-  const qrURL = await generarQR(id, nombre, email, monto);
+  const montoMensual = carrito.reduce((acc, c) => acc + c.precio, 0);
 
-  const alumno = {
+  const qr = await generarQR(id, nombre, email, montoMensual);
+
+  const facturas = [];
+  const hoy = new Date();
+
+  for (let i = 0; i < meses; i++) {
+    const fecha = new Date(hoy.getFullYear(), hoy.getMonth() + i, hoy.getDate());
+    const mes = fecha.getMonth() + 1;
+    const año = fecha.getFullYear();
+
+    facturas.push({
+      numero: `FAC-${año}-${mes}-${id}`,
+      emision: `${año}-${mes}-${fecha.getDate()}`,
+      vencimiento: `${año}-${mes}-${fecha.getDate() + 7}`,
+      estado: "Pendiente",
+      qr
+    });
+  }
+
+  alumnos.push({
     id,
     nombre,
     email,
-    curso,
-    monto,
-    qr: qrURL,
-    facturas: [ generarFactura({ id, nombre, monto, qr: qrURL }) ]
-  };
+    cursos: carrito,
+    montoMensual,
+    duracion: meses,
+    qr,
+    facturas
+  });
 
-  alumnos.push(alumno);
-  guardarAlumnos();
-  alert('Alumno creado correctamente');
+  guardar();
+  alert("Alumno registrado correctamente");
+  carrito = [];
   actualizarResumen();
-}
-
-// FACTURA
-function generarFactura(alumno) {
-  const hoy = new Date();
-  const mes = hoy.getMonth() + 1;
-  const año = hoy.getFullYear();
-
-  return {
-    numero: `FAC-${año}-${mes}-${alumno.id}`,
-    emision: `${año}-${mes}-01`,
-    vencimiento: `${año}-${mes}-12`,
-    estado: "Pendiente",
-    qr: alumno.qr
-  };
 }
 
 // RESUMEN
 function actualizarResumen() {
-  let totalAlumnos = alumnos.length;
-  let pendientes = 0;
-  let pagadas = 0;
-
-  alumnos.forEach(a => {
-    a.facturas.forEach(f => {
-      if (f.estado === 'Pendiente') pendientes++;
-      if (f.estado === 'Pagada') pagadas++;
-    });
-  });
-
-  document.getElementById('resAlumnos').innerText = totalAlumnos;
-  document.getElementById('resPendientes').innerText = pendientes;
-  document.getElementById('resPagadas').innerText = pagadas;
+  resAlumnos.innerText = alumnos.length;
 }
 
 // BUSCAR
 function buscarAlumno() {
-  const q = document.getElementById('busquedaAlumno').value.trim().toLowerCase();
-  const cont = document.getElementById('resultadoBusqueda');
+  const q = busquedaAlumno.value.toLowerCase();
+  const cont = resultadoBusqueda;
   cont.innerHTML = "";
 
-  if (!q) {
-    cont.innerHTML = "<p>Ingresá un nombre o ID para buscar.</p>";
-    return;
-  }
+  const res = alumnos.filter(a => a.nombre.toLowerCase().includes(q) || a.id.includes(q));
+  if (res.length === 0) return cont.innerHTML = "<p>No encontrado</p>";
 
-  const resultados = alumnos.filter(a =>
-    a.nombre.toLowerCase().includes(q) || a.id.toLowerCase().includes(q)
-  );
-
-  if (resultados.length === 0) {
-    cont.innerHTML = "<p>No se encontraron alumnos.</p>";
-    return;
-  }
-
-  resultados.forEach(a => {
-    const factura = a.facturas[0];
+  res.forEach(a => {
     cont.innerHTML += `
-      <div class="card">
+      <div class='card'>
         <h3>${a.nombre} (${a.id})</h3>
-        <p><span class="label">Email:</span> ${a.email}</p>
-        <p><span class="label">Curso:</span> ${a.curso}</p>
-        <p><span class="label">Monto mensual:</span> $${a.monto}</p>
-        <p><span class="label">Factura actual:</span> ${factura.numero}</p>
-        <p><span class="label">Estado:</span> ${factura.estado}${factura.fechaPago ? " (pagada el " + factura.fechaPago + ")" : ""}</p>
-        <button class="btn btn-success" onclick="descargarFactura('${a.id}')">Descargar factura PDF</button>
-        <button class="btn btn-danger" onclick="marcarPagado('${a.id}')">Marcar como pagado</button>
-      </div>
-    `;
+        <p><b>Cursos:</b> ${a.cursos.map(c => c.nombre).join(", ")}</p>
+        <p><b>Monto mensual:</b> $${a.montoMensual}</p>
+        <p><b>Duración:</b> ${a.duracion} meses</p>
+        <button class='btn btn-success' onclick="descargarFactura('${a.id}')">Descargar factura PDF</button>
+      </div>`;
   });
 }
 
-// MERCADO PAGO QR
+// MERCADO PAGO (PEGAR TUS CLAVES AQUÍ)
+const MP_PUBLIC_KEY = "APP_USR-24e13e97-3f85-4a5b-a859-478a1b9ef88d";
+const MP_ACCESS_TOKEN = "APP_USR-3385521442823122-031511-3a833bdaafe97ed820f896519f5e77c0-306613517";
+
 async function generarQR(id, nombre, email, monto) {
   const body = {
-    items: [
-      {
-        title: `Pago mensual - ${nombre}`,
-        quantity: 1,
-        unit_price: monto
-      }
-    ],
-    external_reference: id,
-    payer: { name: nombre, email: email }
+    items: [{ title:`Pago mensual - ${nombre}`, quantity:1, unit_price:monto }],
+    external_reference:id,
+    payer:{ name:nombre, email }
   };
 
   const res = await fetch("https://api.mercadopago.com/checkout/preferences", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${MP_ACCESS_TOKEN}`,
-      "Content-Type": "application/json"
+    method:"POST",
+    headers:{
+      "Authorization":`Bearer ${MP_ACCESS_TOKEN}`,
+      "Content-Type":"application/json"
     },
-    body: JSON.stringify(body)
+    body:JSON.stringify(body)
   });
 
   const data = await res.json();
   return data.init_point;
 }
 
-// PDF CON LOGO DESDE ARCHIVO
+// PDF
 async function descargarFactura(id) {
   const alumno = alumnos.find(a => a.id === id);
-  if (!alumno) return;
   const factura = alumno.facturas[0];
 
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
 
   const img = new Image();
-  img.src = "Kairo logo.png"; // <-- TU ARCHIVO
+  img.src = "Kairo logo.png";
 
   img.onload = function () {
     pdf.addImage(img, "PNG", 10, 10, 40, 40);
@@ -306,35 +298,17 @@ async function descargarFactura(id) {
     pdf.setFontSize(12);
     pdf.text(`Alumno: ${alumno.nombre}`, 10, 60);
     pdf.text(`ID: ${alumno.id}`, 10, 70);
-    pdf.text(`Curso: ${alumno.curso}`, 10, 80);
-    pdf.text(`Factura: ${factura.numero}`, 10, 90);
-    pdf.text(`Monto: $${alumno.monto}`, 10, 100);
+    pdf.text(`Cursos: ${alumno.cursos.map(c => c.nombre).join(", ")}`, 10, 80);
+    pdf.text(`Monto mensual: $${alumno.montoMensual}`, 10, 90);
+    pdf.text(`Factura: ${factura.numero}`, 10, 100);
     pdf.text(`Emisión: ${factura.emision}`, 10, 110);
     pdf.text(`Vencimiento: ${factura.vencimiento}`, 10, 120);
 
     const qr = new QRious({ value: factura.qr, size: 200 });
-    pdf.text("Escaneá para pagar:", 10, 135);
     pdf.addImage(qr.toDataURL(), "PNG", 10, 140, 60, 60);
 
     pdf.save(`Factura-${factura.numero}.pdf`);
   };
-
-  img.onerror = function () {
-    alert("No se pudo cargar el logo. Revisá que 'kairo logo.png' esté en la misma carpeta.");
-  };
-}
-
-// MARCAR COMO PAGADO
-function marcarPagado(id) {
-  const alumno = alumnos.find(a => a.id === id);
-  if (!alumno) return;
-  const factura = alumno.facturas[0];
-  factura.estado = "Pagada";
-  factura.fechaPago = new Date().toISOString().split("T")[0];
-  guardarAlumnos();
-  actualizarResumen();
-  buscarAlumno();
-  alert('Factura marcada como pagada');
 }
 </script>
 
