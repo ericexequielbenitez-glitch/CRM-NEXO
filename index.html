@@ -295,7 +295,7 @@ async function descargarFactura(id) {
   const pdf = new jsPDF();
 
   const img = new Image();
-  img.src = "kairo logo.png"; // <-- TU ARCHIVO
+  img.src = "Kairo logo.png"; // <-- TU ARCHIVO
 
   img.onload = function () {
     pdf.addImage(img, "PNG", 10, 10, 40, 40);
