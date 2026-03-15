@@ -90,6 +90,10 @@ td,th{
 border-bottom:1px solid #ddd;
 padding:10px;
 }
+.peligro{
+color:red;
+font-weight:bold;
+}
 </style>
 </head>
 
@@ -148,6 +152,25 @@ let paso=1
 let venta={}
 let carrito=[]
 
+// precios por curso
+const precios={
+"word-basico":20000,
+"word-intermedio":20000,
+"word-avanzado":20000,
+"excel-basico":20000,
+"excel-intermedio":20000,
+"excel-avanzado":20000,
+"publisher-basico":20000,
+"publisher-intermedio":20000,
+"publisher-avanzado":20000,
+"access-basico":20000,
+"access-intermedio":20000,
+"access-avanzado":20000,
+"ingles":30000,
+"frances":30000,
+"portugues":30000
+}
+
 function login(){
 let u=document.getElementById("user").value
 let p=document.getElementById("pass").value
@@ -177,14 +200,18 @@ w.innerHTML=`
 <h3>Paso 2 — Selección de cursos</h3>
 <select id="curso">
 <option value="">Seleccione un curso</option>
-<option value="excel-basico">Excel Básico</option>
-<option value="excel-intermedio">Excel Intermedio</option>
-<option value="excel-avanzado">Excel Avanzado</option>
-<option value="word">Word</option>
-<option value="powerpoint">Power Point</option>
-<option value="publisher">Publisher</option>
-<option value="access">Access</option>
-<option value="office-plus">Office Plus</option>
+<option value="word-basico">MS Word Básico</option>
+<option value="word-intermedio">MS Word Intermedio</option>
+<option value="word-avanzado">MS Word Avanzado</option>
+<option value="excel-basico">MS Excel Básico</option>
+<option value="excel-intermedio">MS Excel Intermedio</option>
+<option value="excel-avanzado">MS Excel Avanzado</option>
+<option value="publisher-basico">MS Publisher Básico</option>
+<option value="publisher-intermedio">MS Publisher Intermedio</option>
+<option value="publisher-avanzado">MS Publisher Avanzado</option>
+<option value="access-basico">MS Access Básico</option>
+<option value="access-intermedio">MS Access Intermedio</option>
+<option value="access-avanzado">MS Access Avanzado</option>
 <option value="ingles">Inglés</option>
 <option value="frances">Francés</option>
 <option value="portugues">Portugués</option>
@@ -196,6 +223,7 @@ w.innerHTML=`
 if(paso===3){
 w.innerHTML=`
 <h3>Paso 3 — Promoción</h3>
+<p class="peligro">⚠️ No seleccionar ninguna oferta — exclusivo de retención</p>
 <select id="promo" onchange="promo()">
 <option value="0">Sin promo</option>
 <option value="25">25%</option>
@@ -224,17 +252,18 @@ function agregarCarrito(){
 let curso=document.getElementById("curso").value
 if(curso){
 carrito.push(curso)
-document.getElementById("carrito").innerHTML="<h4>Carrito:</h4><ul>"+carrito.map(c=>"<li>"+c+"</li>").join("")+"</ul>"
+document.getElementById("carrito").innerHTML="<h4>Carrito:</h4><ul>"+carrito.map(c=>"<li>"+c+" — $"+precios[c].toLocaleString()+"</li>").join("")+"</ul>"
 venta.cursos=carrito
 }else{alert("Seleccione un curso antes de añadir al carrito")}
 }
 
 function promo(){
 let p=parseInt(document.getElementById("promo").value)
-let total=carrito.length*20 // ejemplo: cada curso 20 USD
+let total=0
+carrito.forEach(c=>{total+=precios[c]})
 if(venta.cursos && venta.cursos.includes("ingles") && p===10){total=total*0.9}else{total=total*(1-p/100)}
 venta.total=total
-document.getElementById("total").innerHTML="Total con promo: USD "+total.toFixed(2)
+document.getElementById("total").innerHTML="Total mensual con promo: $"+total.toLocaleString()
 }
 
 function generarID(){return "ALU-"+Math.floor(Math.random()*100000)}
@@ -250,18 +279,4 @@ dashboard()
 
 function verAlumnos(){ocultar();document.getElementById("alumnos").classList.remove("hidden");render()}
 function render(){
-let tabla=document.getElementById("tabla")
-tabla.innerHTML=""
-alumnos.forEach(a=>{
-tabla.innerHTML+=`<tr><td>${a.id}</td><td>${a.nombre}</td><td>${a.curso}</td><td>${a.estado}</td></tr>`
-})
-}
-function buscar(){
-let f=document.getElementById("buscar").value.toLowerCase()
-document.querySelectorAll("#tabla tr").forEach(r=>{
-r.style.display=r.innerText.toLowerCase().includes(f)?"":"none"
-})
-}
-</script>
-</body>
-</html>
+let tabla=document
