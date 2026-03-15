@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Kairo CRM</title>
+
 <style>
 body{
 font-family:Arial;
@@ -109,9 +110,9 @@ font-weight:bold;
 <button onclick="login()">Ingresar</button>
 </div>
 </div>
-
 <!-- CRM -->
 <div id="crm" class="hidden">
+
 <div class="sidebar">
 <h3>Kairo CRM</h3>
 <button onclick="dashboard()">Dashboard</button>
@@ -120,6 +121,7 @@ font-weight:bold;
 </div>
 
 <div class="main">
+
 <div id="panel" class="card-panel">
 <h3>Panel</h3>
 <p>Bienvenido al CRM del instituto Kairo</p>
@@ -130,6 +132,7 @@ font-weight:bold;
 <div id="alumnos" class="card-panel hidden">
 <h3>Alumnos</h3>
 <input id="buscar" placeholder="Buscar..." onkeyup="buscar()">
+
 <table>
 <thead>
 <tr>
@@ -141,23 +144,25 @@ font-weight:bold;
 </thead>
 <tbody id="tabla"></tbody>
 </table>
-</div>
-</div>
+
 </div>
 
+</div>
+</div>
 <script>
+
 const usuarios = [
   {user:"admin", pass:"1234"},
   {user:"ventas", pass:"1234"}
-]
+];
 
-let alumnos=JSON.parse(localStorage.getItem("alumnos"))||[]
-let paso=1
-let venta={}
-let carrito=[]
+let alumnos = JSON.parse(localStorage.getItem("alumnos")) || [];
+let paso = 1;
+let venta = {};
+let carrito = [];
 
 // precios por curso
-const precios={
+const precios = {
 "word-basico":20000,
 "word-intermedio":20000,
 "word-avanzado":20000,
@@ -173,37 +178,54 @@ const precios={
 "ingles":30000,
 "frances":30000,
 "portugues":30000
-}
+};
 
 function login(){
-  let u=document.getElementById("user").value.trim().toLowerCase()
-  let p=document.getElementById("pass").value.trim()
-  let ok=usuarios.find(x=>x.user.toLowerCase()===u && x.pass===p)
+  let u = document.getElementById("user").value.trim().toLowerCase();
+  let p = document.getElementById("pass").value.trim();
+
+  let ok = usuarios.find(x => x.user.toLowerCase() === u && x.pass === p);
+
   if(ok){
-    document.getElementById("login").style.display="none"
-    document.getElementById("crm").classList.remove("hidden")
-    dashboard()
+    document.getElementById("login").style.display = "none";
+    document.getElementById("crm").classList.remove("hidden");
+    dashboard();
   } else {
-    alert("Usuario o contraseña incorrectos")
+    alert("Usuario o contraseña incorrectos");
   }
 }
 
-function ocultar(){document.querySelectorAll("#panel,#wizard,#alumnos").forEach(x=>x.classList.add("hidden"))}
-function dashboard(){ocultar();document.getElementById("panel").classList.remove("hidden")}
-function nuevaVenta(){paso=1;venta={};carrito=[];ocultar();document.getElementById("wizard").classList.remove("hidden");mostrarPaso()}
+function ocultar(){
+  document.querySelectorAll("#panel,#wizard,#alumnos").forEach(x => x.classList.add("hidden"));
+}
 
+function dashboard(){
+  ocultar();
+  document.getElementById("panel").classList.remove("hidden");
+}
+
+function nuevaVenta(){
+  paso = 1;
+  venta = {};
+  carrito = [];
+  ocultar();
+  document.getElementById("wizard").classList.remove("hidden");
+  mostrarPaso();
+}
 function mostrarPaso(){
-let w=document.getElementById("wizard")
-if(paso===1){
-w.innerHTML=`
+let w = document.getElementById("wizard");
+
+if(paso === 1){
+w.innerHTML = `
 <h3>Paso 1 — Datos personales</h3>
 <input id="nombre" placeholder="Nombre">
 <input id="apellido" placeholder="Apellido">
 <input id="dni" placeholder="DNI"><br><br>
-<button onclick="guardarDatos()">Siguiente</button>`
+<button onclick="guardarDatos()">Siguiente</button>`;
 }
-if(paso===2){
-w.innerHTML=`
+
+if(paso === 2){
+w.innerHTML = `
 <h3>Paso 2 — Selección de cursos</h3>
 <select id="curso">
 <option value="">Seleccione un curso</option>
@@ -223,14 +245,19 @@ w.innerHTML=`
 <option value="frances">Francés</option>
 <option value="portugues">Portugués</option>
 </select><br><br>
+
 <button onclick="agregarCarrito()">🛒 Añadir al carrito</button>
+
 <div id="carrito"></div><br>
-<button onclick="siguiente()">Siguiente</button>`
+
+<button onclick="siguiente()">Siguiente</button>`;
 }
-if(paso===3){
-w.innerHTML=`
+
+if(paso === 3){
+w.innerHTML = `
 <h3>Paso 3 — Promoción</h3>
 <p class="peligro">⚠️ No seleccionar ninguna oferta — exclusivo de retención</p>
+
 <select id="promo" onchange="promo()">
 <option value="0">Sin promo</option>
 <option value="25">25%</option>
@@ -238,46 +265,119 @@ w.innerHTML=`
 <option value="50">50%</option>
 <option value="10">Idioma 10%</option>
 </select>
+
 <div id="total"></div><br>
-<button onclick="siguiente()">Siguiente</button>`
+
+<button onclick="siguiente()">Siguiente</button>`;
 }
-if(paso===4){
-w.innerHTML=`
+
+if(paso === 4){
+w.innerHTML = `
 <h3>Paso 4 — Pago</h3>
 <select id="pago">
 <option>No pagó</option>
 <option>Pagó</option>
 </select><br><br>
-<button onclick="finalizar()">Finalizar</button>`
+
+<button onclick="finalizar()">Finalizar</button>`;
 }
 }
 
-function guardarDatos(){venta.nombre=document.getElementById("nombre").value;siguiente()}
-function siguiente(){paso++;mostrarPaso()}
+function guardarDatos(){
+venta.nombre = document.getElementById("nombre").value;
+siguiente();
+}
+
+function siguiente(){
+paso++;
+mostrarPaso();
+}
 
 function agregarCarrito(){
-let curso=document.getElementById("curso").value
+let curso = document.getElementById("curso").value;
+
 if(curso){
-carrito.push(curso)
-document.getElementById("carrito").innerHTML="<h4>Carrito:</h4><ul>"+carrito.map(c=>"<li>"+c+" — $"+precios[c].toLocaleString()+"</li>").join("")+"</ul>"
-venta.cursos=carrito
-}else{alert("Seleccione un curso antes de añadir al carrito")}
+carrito.push(curso);
+
+document.getElementById("carrito").innerHTML =
+"<h4>Carrito:</h4><ul>" +
+carrito.map(c => "<li>" + c + " — $" + precios[c].toLocaleString() + "</li>").join("") +
+"</ul>";
+
+venta.cursos = carrito;
+
+} else {
+alert("Seleccione un curso antes de añadir al carrito");
+}
 }
 
 function promo(){
-let p=parseInt(document.getElementById("promo").value)
-let total=0
-carrito.forEach(c=>{total+=precios[c]})
-if(venta.cursos && venta.cursos.includes("ingles") && p===10){total=total*0.9}else{total=total*(1-p/100)}
-venta.total=total
-document.getElementById("total").innerHTML="Total mensual con promo: $"+total.toLocaleString()
+let p = parseInt(document.getElementById("promo").value);
+let total = 0;
+
+carrito.forEach(c => total += precios[c]);
+
+if(venta.cursos && venta.cursos.includes("ingles") && p === 10){
+total = total * 0.9;
+} else {
+total = total * (1 - p/100);
 }
 
-function generarID(){return "ALU-"+Math.floor(Math.random()*100000)}
-function generarGestion(){return "GEST-"+Date.now()}
+venta.total = total;
+
+document.getElementById("total").innerHTML =
+"Total mensual con promo: $" + total.toLocaleString();
+}
+
+function generarID(){return "ALU-" + Math.floor(Math.random()*100000);}
+function generarGestion(){return "GEST-" + Date.now();}
 
 function finalizar(){
-let alumno={id:generarID(),gestion:generarGestion(),nombre:venta.nombre,curso:(venta.cursos||[]).join(", "),estado:document.getElementById("pago").value==="Pagó"?"Activo":"Inactivo"}
-alumnos.push(alumno)
-localStorage.setItem("alumnos",JSON.stringify(alumnos))
-alert("Alumno
+let alumno = {
+id: generarID(),
+gestion: generarGestion(),
+nombre: venta.nombre,
+curso: (venta.cursos || []).join(", "),
+estado: document.getElementById("pago").value === "Pagó" ? "Activo" : "Inactivo"
+};
+
+alumnos.push(alumno);
+localStorage.setItem("alumnos", JSON.stringify(alumnos));
+
+alert("Alumno registrado");
+dashboard();
+}
+
+function verAlumnos(){
+ocultar();
+document.getElementById("alumnos").classList.remove("hidden");
+render();
+}
+
+function render(){
+let tabla = document.getElementById("tabla");
+tabla.innerHTML = "";
+
+alumnos.forEach(a => {
+tabla.innerHTML += `
+<tr>
+<td>${a.id}</td>
+<td>${a.nombre}</td>
+<td>${a.curso}</td>
+<td>${a.estado}</td>
+</tr>`;
+});
+}
+
+function buscar(){
+let f = document.getElementById("buscar").value.toLowerCase();
+
+document.querySelectorAll("#tabla tr").forEach(r => {
+r.style.display = r.innerText.toLowerCase().includes(f) ? "" : "none";
+});
+}
+
+</script>
+
+</body>
+</html>
