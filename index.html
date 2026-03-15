@@ -35,10 +35,13 @@
 <div id="loginScreen">
   <div id="loginBox">
     <h2>Kairo CRM</h2>
-    <label>Usuario</label><br>
-    <input id="loginUser" placeholder="admin"><br><br>
+
+    <label>Vendedor</label><br>
+    <select id="loginUser"></select><br><br>
+
     <label>Contraseña</label><br>
-    <input id="loginPass" type="password" placeholder="1234"><br><br>
+    <input id="loginPass" type="password" placeholder="Contraseña"><br><br>
+
     <button class="btn btn-primary" onclick="login()">Ingresar</button>
   </div>
 </div>
@@ -82,6 +85,49 @@
       <label>Email</label>
       <input id="nuevoEmail">
 
+      <label>País</label>
+      <select id="nuevoPais">
+        <option value="Argentina">Argentina</option>
+      </select>
+
+      <label>Provincia</label>
+      <select id="nuevoProvincia">
+        <option value="Buenos Aires">Buenos Aires</option>
+        <option value="CABA">CABA</option>
+        <option value="Catamarca">Catamarca</option>
+        <option value="Chaco">Chaco</option>
+        <option value="Chubut">Chubut</option>
+        <option value="Córdoba">Córdoba</option>
+        <option value="Corrientes">Corrientes</option>
+        <option value="Entre Ríos">Entre Ríos</option>
+        <option value="Formosa">Formosa</option>
+        <option value="Jujuy">Jujuy</option>
+        <option value="La Pampa">La Pampa</option>
+        <option value="La Rioja">La Rioja</option>
+        <option value="Mendoza">Mendoza</option>
+        <option value="Misiones">Misiones</option>
+        <option value="Neuquén">Neuquén</option>
+        <option value="Río Negro">Río Negro</option>
+        <option value="Salta">Salta</option>
+        <option value="San Juan">San Juan</option>
+        <option value="San Luis">San Luis</option>
+        <option value="Santa Cruz">Santa Cruz</option>
+        <option value="Santa Fe">Santa Fe</option>
+        <option value="Santiago del Estero">Santiago del Estero</option>
+        <option value="Tierra del Fuego">Tierra del Fuego</option>
+        <option value="Tucumán">Tucumán</option>
+      </select>
+
+      <label>DNI</label>
+      <input id="nuevoDni">
+
+      <label>Estado del alumno</label>
+      <select id="nuevoEstado">
+        <option value="preactivo">Preactivo</option>
+        <option value="activo">Activo</option>
+        <option value="inactivo">Inactivo</option>
+      </select>
+
       <h3>Cursos disponibles</h3>
       <div id="listaCursos"></div>
 
@@ -102,19 +148,52 @@
 </div>
 
 <script>
+// CONFIG
+const URL_WEBAPP_VENDEDORES = "https://script.google.com/macros/s/AKfycbyUeLq5wnBqRHhtsCSdKPR5aHXlJiqpKuSoDFnSt0-hT85JJrpVqAesiapgtf2WI98CLA/exec";
+const URL_WEBAPP_ALUMNOS = "https://script.google.com/macros/s/AKfycbzDNyRC0fWJpS6ZDoWtfzomcBDFh7_wWVRJqpEcnbkBfrZCWjFM6w1UekFT8ch-kDqz/exec";
+
+const MP_PUBLIC_KEY = "APP_USR-24e13e97-3f85-4a5b-a859-478a1b9ef88d";
+const MP_ACCESS_TOKEN = "APP_USR-3385521442823122-031511-3a833bdaafe97ed820f896519f5e77c0-306613517";
+
+
 // LOGIN
+async function cargarUsuarios() {
+  const res = await fetch(URL_WEBAPP_VENDEDORES);
+  const data = await res.json();
+
+  loginUser.innerHTML = "";
+
+  data.usuarios.forEach(u => {
+    const opt = document.createElement("option");
+    opt.value = JSON.stringify(u);
+    opt.textContent = `${u.legajo} – ${u.nombre}`;
+    loginUser.appendChild(opt);
+  });
+}
+cargarUsuarios();
+
 function login() {
-  if (loginUser.value === "admin" && loginPass.value === "1234") {
-    loginScreen.style.display = "none";
-    app.style.display = "block";
-    actualizarResumen();
-  } else alert("Credenciales incorrectas");
+  const vendedor = JSON.parse(loginUser.value);
+  const pass = loginPass.value;
+
+  if (pass !== "kairo2025") {
+    alert("Contraseña incorrecta");
+    return;
+  }
+
+  localStorage.setItem("vendedorLegajo", vendedor.legajo);
+  localStorage.setItem("vendedorNombre", vendedor.nombre);
+
+  loginScreen.style.display = "none";
+  app.style.display = "block";
+  cargarDatos();
 }
 
 function logout() {
   app.style.display = "none";
   loginScreen.style.display = "flex";
 }
+
 
 // NAVEGACIÓN
 function mostrarPanel(p) {
@@ -125,6 +204,7 @@ function mostrarPanel(p) {
   if (p === "buscar") panelBuscar.style.display = "block";
   if (p === "nueva") panelNueva.style.display = "block";
 }
+
 
 // CURSOS
 const cursos = [
@@ -176,62 +256,73 @@ function actualizarTotal() {
   document.getElementById("totalMostrar").innerText = "$" + total;
 }
 
-// BASE DE DATOS
+
+// BASE DE DATOS LOCAL
 let alumnos = JSON.parse(localStorage.getItem("alumnos_kairo")) || [];
 function guardar() { localStorage.setItem("alumnos_kairo", JSON.stringify(alumnos)); }
+
+function cargarDatos() {
+  actualizarResumen();
+  generarFacturasAutomaticas();
+  actualizarPagosAutomaticos();
+}
+
 
 // CREAR ALUMNO
 async function crearAlumno() {
   if (carrito.length === 0) return alert("Elegí al menos un curso");
+
   const nombre = nuevoNombre.value.trim();
   const email = nuevoEmail.value.trim();
+  const pais = nuevoPais.value.trim();
+  const provincia = nuevoProvincia.value.trim();
+  const dni = nuevoDni.value.trim();
+  const estado = nuevoEstado.value;
   const meses = parseInt(duracion.value);
 
-  if (!nombre || !email) return alert("Completá nombre y email");
+  if (!nombre || !email || !pais || !provincia || !dni) {
+    return alert("Completá todos los datos");
+  }
 
   const id = "ALU-" + Date.now();
   const montoMensual = carrito.reduce((acc, c) => acc + c.precio, 0);
+  const fechaInscripcion = new Date().toISOString().split('T')[0];
 
-  const qr = await generarQR(id, nombre, email, montoMensual);
+  const qr = await generarQRAlumno(id, nombre, email, montoMensual);
 
-  const facturas = [];
-  const hoy = new Date();
-
-  for (let i = 0; i < meses; i++) {
-    const fecha = new Date(hoy.getFullYear(), hoy.getMonth() + i, hoy.getDate());
-    const mes = fecha.getMonth() + 1;
-    const año = fecha.getFullYear();
-
-    facturas.push({
-      numero: `FAC-${año}-${mes}-${id}`,
-      emision: `${año}-${mes}-${fecha.getDate()}`,
-      vencimiento: `${año}-${mes}-${fecha.getDate() + 7}`,
-      estado: "Pendiente",
-      qr
-    });
-  }
-
-  alumnos.push({
+  const alumno = {
     id,
     nombre,
     email,
+    pais,
+    provincia,
+    dni,
     cursos: carrito,
     montoMensual,
     duracion: meses,
+    estado,
     qr,
-    facturas
-  });
+    fechaInscripcion,
+    vendedorLegajo: localStorage.getItem("vendedorLegajo"),
+    vendedorNombre: localStorage.getItem("vendedorNombre"),
+    facturas: []
+  };
 
+  alumnos.push(alumno);
   guardar();
+  enviarAGoogleSheets(alumno);
+
   alert("Alumno registrado correctamente");
   carrito = [];
   actualizarResumen();
 }
 
+
 // RESUMEN
 function actualizarResumen() {
   resAlumnos.innerText = alumnos.length;
 }
+
 
 // BUSCAR
 function buscarAlumno() {
@@ -243,22 +334,43 @@ function buscarAlumno() {
   if (res.length === 0) return cont.innerHTML = "<p>No encontrado</p>";
 
   res.forEach(a => {
+    const facturasHtml = a.facturas.map(f => `
+      <tr>
+        <td>${f.numero}</td>
+        <td>${f.emision}</td>
+        <td>${f.vencimiento}</td>
+        <td>${f.estado}</td>
+        <td>${f.fechaPago || ""}</td>
+      </tr>
+    `).join("");
+
     cont.innerHTML += `
       <div class='card'>
         <h3>${a.nombre} (${a.id})</h3>
+        <p><b>DNI:</b> ${a.dni}</p>
+        <p><b>País:</b> ${a.pais} - <b>Provincia:</b> ${a.provincia}</p>
         <p><b>Cursos:</b> ${a.cursos.map(c => c.nombre).join(", ")}</p>
         <p><b>Monto mensual:</b> $${a.montoMensual}</p>
         <p><b>Duración:</b> ${a.duracion} meses</p>
-        <button class='btn btn-success' onclick="descargarFactura('${a.id}')">Descargar factura PDF</button>
+        <p><b>Estado:</b> ${a.estado}</p>
+        <p><b>Venta realizada por:</b> ${a.vendedorLegajo} – ${a.vendedorNombre}</p>
+        <p><b>QR de pago:</b> <a href="${a.qr}" target="_blank">Abrir link de pago</a></p>
+
+        <h4>Facturas</h4>
+        <table>
+          <tr><th>Número</th><th>Emisión</th><th>Vencimiento</th><th>Estado</th><th>Fecha pago</th></tr>
+          ${facturasHtml}
+        </table>
+
+        <br>
+        <button class='btn btn-success' onclick="descargarFactura('${a.id}')">Descargar primera factura pendiente en PDF</button>
       </div>`;
   });
 }
 
-// MERCADO PAGO (PEGAR TUS CLAVES AQUÍ)
-const MP_PUBLIC_KEY = "APP_USR-24e13e97-3f85-4a5b-a859-478a1b9ef88d";
-const MP_ACCESS_TOKEN = "APP_USR-3385521442823122-031511-3a833bdaafe97ed820f896519f5e77c0-306613517";
 
-async function generarQR(id, nombre, email, monto) {
+// MERCADO PAGO - QR POR ALUMNO
+async function generarQRAlumno(id, nombre, email, monto) {
   const body = {
     items: [{ title:`Pago mensual - ${nombre}`, quantity:1, unit_price:monto }],
     external_reference:id,
@@ -278,39 +390,21 @@ async function generarQR(id, nombre, email, monto) {
   return data.init_point;
 }
 
-// PDF
-async function descargarFactura(id) {
-  const alumno = alumnos.find(a => a.id === id);
-  const factura = alumno.facturas[0];
 
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF();
+// FACTURACIÓN AUTOMÁTICA EL DÍA 01
+function generarFacturasAutomaticas() {
+  const hoy = new Date();
+  const dia = hoy.getDate();
+  if (dia !== 1) return;
 
-  const img = new Image();
-  img.src = "Kairo logo.png";
+  alumnos.forEach(alumno => {
+    if (alumno.estado !== "activo") return;
 
-  img.onload = function () {
-    pdf.addImage(img, "PNG", 10, 10, 40, 40);
+    const fechaIns = new Date(alumno.fechaInscripcion);
+    const mesesContratados = alumno.duracion;
 
-    pdf.setFontSize(18);
-    pdf.text("Factura Kairo", 70, 20);
+    for (let i = 0; i < mesesContratados; i++) {
+      const fechaMes = new Date(fechaIns.getFullYear(), fechaIns.getMonth() + i, 1);
+      if (hoy < fechaMes) continue;
 
-    pdf.setFontSize(12);
-    pdf.text(`Alumno: ${alumno.nombre}`, 10, 60);
-    pdf.text(`ID: ${alumno.id}`, 10, 70);
-    pdf.text(`Cursos: ${alumno.cursos.map(c => c.nombre).join(", ")}`, 10, 80);
-    pdf.text(`Monto mensual: $${alumno.montoMensual}`, 10, 90);
-    pdf.text(`Factura: ${factura.numero}`, 10, 100);
-    pdf.text(`Emisión: ${factura.emision}`, 10, 110);
-    pdf.text(`Vencimiento: ${factura.vencimiento}`, 10, 120);
-
-    const qr = new QRious({ value: factura.qr, size: 200 });
-    pdf.addImage(qr.toDataURL(), "PNG", 10, 140, 60, 60);
-
-    pdf.save(`Factura-${factura.numero}.pdf`);
-  };
-}
-</script>
-
-</body>
-</html>
+      const mes = (fechaMes.getMonth() + 1).
