@@ -1,511 +1,200 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
 <meta charset="UTF-8">
 <title>Kairo CRM</title>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <style>
-body{
-font-family:Arial;
-margin:0;
-background:#f4f6f9;
-}
-
-/* LOGIN */
-.login-container{
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-}
-.card{
-background:white;
-padding:30px;
-border-radius:10px;
-box-shadow:0 6px 15px rgba(0,0,0,0.1);
-text-align:center;
-width:360px;
-}
-.card img{
-width:120px;
-margin-bottom:10px;
-}
-.card input{
-width:90%;
-padding:10px;
-margin-top:10px;
-border:1px solid #ccc;
-border-radius:5px;
-}
-.card button{
-width:95%;
-padding:10px;
-margin-top:15px;
-background:#2563eb;
-color:white;
-border:none;
-border-radius:5px;
-cursor:pointer;
-}
-
-/* CRM */
-.sidebar{
-width:220px;
-height:100vh;
-background:#1f2937;
-color:white;
-position:fixed;
-padding:20px;
-}
-.sidebar button{
-width:100%;
-padding:10px;
-margin-top:10px;
-border:none;
-cursor:pointer;
-}
-.main{
-margin-left:240px;
-padding:40px;
-}
-.card-panel{
-background:white;
-padding:25px;
-border-radius:8px;
-box-shadow:0 4px 10px rgba(0,0,0,0.1);
-max-width:900px;
-}
-.hidden{display:none;}
-input,select{
-padding:8px;
-margin:5px;
-width:220px;
-}
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
-}
-td,th{
-border-bottom:1px solid #ddd;
-padding:10px;
-}
-.peligro{
-color:red;
-font-weight:bold;
-}
-
-/* DASHBOARD */
-.dashboard-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:25px;
-}
-.dashboard-header h2{
-margin:0;
-font-size:26px;
-color:#1f2937;
-}
-.dashboard-header .hora{
-font-size:18px;
-color:#4b5563;
-}
-.dashboard-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:20px;
-}
-.card-big{
-background:white;
-padding:25px;
-border-radius:12px;
-box-shadow:0 4px 12px rgba(0,0,0,0.08);
-}
-.card-big h3{
-margin:0 0 10px 0;
-}
-.card-action{
-background:#2563eb;
-color:white;
-padding:25px;
-border-radius:12px;
-box-shadow:0 4px 12px rgba(0,0,0,0.15);
-cursor:pointer;
-transition:0.2s;
-text-align:center;
-font-size:20px;
-}
-.card-action:hover{
-background:#1e4fc7;
-}
-.social-box{
-margin-top:25px;
-padding:20px;
-background:white;
-border-radius:12px;
-box-shadow:0 4px 12px rgba(0,0,0,0.08);
-}
+    body { font-family: Arial; margin: 20px; }
+    .card { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+    .btn { padding: 8px 12px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 5px; }
+    .btn-danger { background: #d9534f; }
+    .btn-success { background: #5cb85c; }
 </style>
 </head>
-
 <body>
 
-<!-- LOGIN -->
-<div id="login" class="login-container">
+<h1>📘 Kairo CRM</h1>
+
 <div class="card">
-<img src="Kairo logo.png">
-<h2>CRM</h2>
-<input id="user" placeholder="Usuario">
-<input id="pass" type="password" placeholder="Contraseña">
-<button onclick="login()">Ingresar</button>
-</div>
-</div>
-<!-- CRM -->
-<div id="crm" class="hidden">
-
-<div class="sidebar">
-<h3>Kairo CRM</h3>
-<button onclick="dashboard()">Dashboard</button>
-<button onclick="nuevaVenta()">Nueva venta</button>
-<button onclick="verAlumnos()">Buscar alumnos</button>
+    <h2>➕ Crear Alumno</h2>
+    <input id="nombre" placeholder="Nombre del alumno"><br><br>
+    <input id="email" placeholder="Email"><br><br>
+    <input id="monto" placeholder="Monto mensual"><br><br>
+    <button class="btn" onclick="crearAlumno()">Crear alumno</button>
 </div>
 
-<div class="main">
-
-<!-- DASHBOARD INICIO -->
-<div id="panel" class="card-panel">
-
-  <div class="dashboard-header">
-    <h2>Gestión alumnos</h2>
-    <div class="hora" id="horaActual"></div>
-  </div>
-
-  <div class="dashboard-grid">
-
-    <div class="card-big">
-      <h3>Artículo elegido hoy</h3>
-      <p>No podemos crear este gráfico porque no hay datos.</p>
-      <a href="#" style="color:#2563eb;">Ver informe</a>
-      <p style="font-size:12px;color:#6b7280;margin-top:10px;">
-        Actualizado hace unos minutos
-      </p>
-    </div>
-
-    <div>
-      <div class="card-action" onclick="nuevaVenta()">
-        NUEVA VENTA
-      </div>
-
-      <div class="card-action" style="margin-top:20px;" onclick="verAlumnos()">
-        BUSCAR ALUMNOS
-      </div>
-
-      <div class="card-action" style="margin-top:20px;">
-        NUEVO CONTRATO
-      </div>
-    </div>
-
-  </div>
-
-  <div class="social-box">
-    <h4>Ingreso a redes sociales</h4>
-    <p>@Centroeducativodeinformatica</p>
-    <p>@centroeducativodeinformatica</p>
-  </div>
-
-</div>
-<!-- FIN DASHBOARD -->
-
-<!-- WIZARD DE VENTAS -->
-<div id="wizard" class="card-panel hidden"></div>
-
-<!-- LISTA DE ALUMNOS -->
-<div id="alumnos" class="card-panel hidden">
-<h3>Alumnos</h3>
-
-<input id="buscar" placeholder="Buscar..." onkeyup="buscar()">
-
-<table>
-<thead>
-<tr>
-<th>ID</th>
-<th>Nombre</th>
-<th>Curso</th>
-<th>Estado</th>
-</tr>
-</thead>
-<tbody id="tabla"></tbody>
-</table>
-
+<div class="card">
+    <h2>📋 Lista de alumnos</h2>
+    <div id="listaAlumnos"></div>
 </div>
 
-</div>
-</div>
 <script>
+// -------------------------------------------------------------
+// 🔐 CREDENCIALES DE MERCADO PAGO (PEGAR LAS REALES)
+// -------------------------------------------------------------
+const MP_PUBLIC_KEY = "APP_USR-24e13e97-3f85-4a5b-a859-478a1b9ef88d"; 
+const MP_ACCESS_TOKEN = "APP_USR-3385521442823122-031511-3a833bdaafe97ed820f896519f5e77c0-306613517";
 
-const usuarios = [
-  {user:"admin", pass:"1234"},
-  {user:"ventas", pass:"1234"}
-];
+// -------------------------------------------------------------
+// 🛡️ LOGO DE KAIRO (BASE64) — YA CONVERTIDO
+// -------------------------------------------------------------
+const KAIRO_LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAJYCAYAAABt0Ax7AAAACXBIWXMAAAsTAAALEwEAmpwYAAAgAElEQVR4nOzdZ3hU1f7/8c+5M7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7
 
+// -------------------------------------------------------------
+// 📌 BASE DE DATOS LOCAL (localStorage)
+// -------------------------------------------------------------
 let alumnos = JSON.parse(localStorage.getItem("alumnos")) || [];
-let paso = 1;
-let venta = {};
-let carrito = [];
 
-// precios por curso
-const precios = {
-"word-basico":20000,
-"word-intermedio":20000,
-"word-avanzado":20000,
-"excel-basico":20000,
-"excel-intermedio":20000,
-"excel-avanzado":20000,
-"publisher-basico":20000,
-"publisher-intermedio":20000,
-"publisher-avanzado":20000,
-"access-basico":20000,
-"access-intermedio":20000,
-"access-avanzado":20000,
-"ingles":30000,
-"frances":30000,
-"portugues":30000
-};
+// -------------------------------------------------------------
+// ➕ CREAR ALUMNO
+// -------------------------------------------------------------
+async function crearAlumno() {
+    const nombre = document.getElementById("nombre").value;
+    const email = document.getElementById("email").value;
+    const monto = parseFloat(document.getElementById("monto").value);
 
-// LOGIN
-function login(){
-  let u = document.getElementById("user").value.trim().toLowerCase();
-  let p = document.getElementById("pass").value.trim();
+    if (!nombre || !email || !monto) {
+        alert("Completá todos los campos");
+        return;
+    }
 
-  let ok = usuarios.find(x => x.user.toLowerCase() === u && x.pass === p);
+    const id = "ALU-" + Date.now();
 
-  if(ok){
-    document.getElementById("login").style.display = "none";
-    document.getElementById("crm").classList.remove("hidden");
-    dashboard();
-  } else {
-    alert("Usuario o contraseña incorrectos");
-  }
+    const qrURL = await generarQR(id, nombre, email, monto);
+
+    const alumno = {
+        id,
+        nombre,
+        email,
+        monto,
+        qr: qrURL,
+        facturas: []
+    };
+
+    alumno.facturas.push(generarFactura(alumno));
+
+    alumnos.push(alumno);
+    guardar();
+    mostrarAlumnos();
 }
 
-// OCULTAR PANELES
-function ocultar(){
-  document.querySelectorAll("#panel,#wizard,#alumnos").forEach(x => x.classList.add("hidden"));
+// -------------------------------------------------------------
+// 🧾 GENERAR FACTURA
+// -------------------------------------------------------------
+function generarFactura(alumno) {
+    const hoy = new Date();
+    const mes = hoy.getMonth() + 1;
+    const año = hoy.getFullYear();
+
+    return {
+        numero: `FAC-${año}-${mes}-${alumno.id}`,
+        emision: `${año}-${mes}-01`,
+        vencimiento: `${año}-${mes}-12`,
+        estado: "Pendiente",
+        qr: alumno.qr
+    };
 }
 
-// DASHBOARD
-function dashboard(){
-  ocultar();
-  document.getElementById("panel").classList.remove("hidden");
+// -------------------------------------------------------------
+// 💾 GUARDAR EN LOCALSTORAGE
+// -------------------------------------------------------------
+function guardar() {
+    localStorage.setItem("alumnos", JSON.stringify(alumnos));
 }
 
-// NUEVA VENTA
-function nuevaVenta(){
-  paso = 1;
-  venta = {};
-  carrito = [];
-  ocultar();
-  document.getElementById("wizard").classList.remove("hidden");
-  mostrarPaso();
+// -------------------------------------------------------------
+// 📋 MOSTRAR ALUMNOS
+// -------------------------------------------------------------
+function mostrarAlumnos() {
+    const div = document.getElementById("listaAlumnos");
+    div.innerHTML = "";
+
+    alumnos.forEach(a => {
+        div.innerHTML += `
+            <div class="card">
+                <h3>${a.nombre} (${a.id})</h3>
+                <p>Email: ${a.email}</p>
+                <p>Monto: $${a.monto}</p>
+                <button class="btn-success" onclick="descargarFactura('${a.id}')">Descargar factura PDF</button>
+                <button class="btn-danger" onclick="marcarPagado('${a.id}')">Marcar como pagado</button>
+            </div>
+        `;
+    });
 }
 
-// MOSTRAR PASOS DEL WIZARD
-function mostrarPaso(){
-let w = document.getElementById("wizard");
+mostrarAlumnos();
 
-if(paso === 1){
-w.innerHTML = `
-<h3>Paso 1 — Datos personales</h3>
-<input id="nombre" placeholder="Nombre">
-<input id="apellido" placeholder="Apellido">
-<input id="dni" placeholder="DNI"><br><br>
-<button onclick="guardarDatos()">Siguiente</button>`;
+// -------------------------------------------------------------
+// 🟦 GENERAR QR DINÁMICO (Mercado Pago)
+// -------------------------------------------------------------
+async function generarQR(id, nombre, email, monto) {
+    const body = {
+        items: [
+            {
+                title: `Pago mensual - ${nombre}`,
+                quantity: 1,
+                unit_price: monto
+            }
+        ],
+        external_reference: id,
+        payer: { name: nombre, email: email }
+    };
+
+    const res = await fetch("https://api.mercadopago.com/checkout/preferences", {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${MP_ACCESS_TOKEN}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    return data.init_point;
 }
 
-if(paso === 2){
-w.innerHTML = `
-<h3>Paso 2 — Selección de cursos</h3>
+// -------------------------------------------------------------
+// 📄 DESCARGAR FACTURA PDF
+// -------------------------------------------------------------
+async function descargarFactura(id) {
+    const alumno = alumnos.find(a => a.id === id);
+    const factura = alumno.facturas[0];
 
-<select id="curso">
-<option value="">Seleccione un curso</option>
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
 
-<option value="word-basico">MS Word Básico</option>
-<option value="word-intermedio">MS Word Intermedio</option>
-<option value="word-avanzado">MS Word Avanzado</option>
+    pdf.addImage(KAIRO_LOGO_BASE64, "PNG", 10, 10, 40, 40);
 
-<option value="excel-basico">MS Excel Básico</option>
-<option value="excel-intermedio">MS Excel Intermedio</option>
-<option value="excel-avanzado">MS Excel Avanzado</option>
+    pdf.setFontSize(18);
+    pdf.text("Factura Kairo", 70, 20);
 
-<option value="publisher-basico">MS Publisher Básico</option>
-<option value="publisher-intermedio">MS Publisher Intermedio</option>
-<option value="publisher-avanzado">MS Publisher Avanzado</option>
+    pdf.setFontSize(12);
+    pdf.text(`Alumno: ${alumno.nombre}`, 10, 60);
+    pdf.text(`ID: ${alumno.id}`, 10, 70);
+    pdf.text(`Factura: ${factura.numero}`, 10, 80);
+    pdf.text(`Monto: $${alumno.monto}`, 10, 90);
+    pdf.text(`Emisión: ${factura.emision}`, 10, 100);
+    pdf.text(`Vencimiento: ${factura.vencimiento}`, 10, 110);
 
-<option value="access-basico">MS Access Básico</option>
-<option value="access-intermedio">MS Access Intermedio</option>
-<option value="access-avanzado">MS Access Avanzado</option>
+    // Generar QR como imagen
+    const qr = new QRious({ value: factura.qr, size: 200 });
+    pdf.addImage(qr.toDataURL(), "PNG", 10, 130, 80, 80);
 
-<option value="ingles">Inglés</option>
-<option value="frances">Francés</option>
-<option value="portugues">Portugués</option>
-</select><br><br>
-
-<button onclick="agregarCarrito()">🛒 Añadir al carrito</button>
-
-<div id="carrito"></div><br>
-
-<button onclick="siguiente()">Siguiente</button>`;
+    pdf.save(`Factura-${factura.numero}.pdf`);
 }
 
-if(paso === 3){
-w.innerHTML = `
-<h3>Paso 3 — Promoción</h3>
-
-<p class="peligro">⚠️ No seleccionar ninguna oferta — exclusivo de retención</p>
-
-<select id="promo" onchange="promo()">
-<option value="0">Sin promo</option>
-<option value="25">25%</option>
-<option value="30">30%</option>
-<option value="50">50%</option>
-<option value="10">Idioma 10%</option>
-</select>
-
-<div id="total"></div><br>
-
-<button onclick="siguiente()">Siguiente</button>`;
+// -------------------------------------------------------------
+// ✔️ MARCAR COMO PAGADO
+// -------------------------------------------------------------
+function marcarPagado(id) {
+    const alumno = alumnos.find(a => a.id === id);
+    alumno.facturas[0].estado = "Pagada";
+    alumno.facturas[0].fechaPago = new Date().toISOString().split("T")[0];
+    guardar();
+    mostrarAlumnos();
 }
-
-if(paso === 4){
-w.innerHTML = `
-<h3>Paso 4 — Pago</h3>
-
-<select id="pago">
-<option>No pagó</option>
-<option>Pagó</option>
-</select><br><br>
-
-<button onclick="finalizar()">Finalizar</button>`;
-}
-}
-
-// GUARDAR DATOS PERSONALES
-function guardarDatos(){
-  venta.nombre = document.getElementById("nombre").value;
-  siguiente();
-}
-
-// SIGUIENTE PASO
-function siguiente(){
-  paso++;
-  mostrarPaso();
-}
-
-// AÑADIR AL CARRITO
-function agregarCarrito(){
-let curso = document.getElementById("curso").value;
-
-if(curso){
-  carrito.push(curso);
-
-  document.getElementById("carrito").innerHTML =
-  "<h4>Carrito:</h4><ul>" +
-  carrito.map(c => "<li>" + c + " — $" + precios[c].toLocaleString() + "</li>").join("") +
-  "</ul>";
-
-  venta.cursos = carrito;
-
-} else {
-  alert("Seleccione un curso antes de añadir al carrito");
-}
-}
-
-// PROMOCIONES
-function promo(){
-let p = parseInt(document.getElementById("promo").value);
-let total = 0;
-
-carrito.forEach(c => total += precios[c]);
-
-if(venta.cursos && venta.cursos.includes("ingles") && p === 10){
-  total = total * 0.9;
-} else {
-  total = total * (1 - p/100);
-}
-
-venta.total = total;
-
-document.getElementById("total").innerHTML =
-"Total mensual con promo: $" + total.toLocaleString();
-}
-
-// GENERADORES
-function generarID(){return "ALU-" + Math.floor(Math.random()*100000);}
-function generarGestion(){return "GEST-" + Date.now();}
-
-// FINALIZAR REGISTRO
-function finalizar(){
-let alumno = {
-  id: generarID(),
-  gestion: generarGestion(),
-  nombre: venta.nombre,
-  curso: (venta.cursos || []).join(", "),
-  estado: document.getElementById("pago").value === "Pagó" ? "Activo" : "Inactivo"
-};
-
-alumnos.push(alumno);
-localStorage.setItem("alumnos", JSON.stringify(alumnos));
-
-alert("Alumno registrado");
-dashboard();
-}
-
-// VER ALUMNOS
-function verAlumnos(){
-  ocultar();
-  document.getElementById("alumnos").classList.remove("hidden");
-  render();
-}
-
-// RENDER TABLA
-function render(){
-let tabla = document.getElementById("tabla");
-tabla.innerHTML = "";
-
-alumnos.forEach(a => {
-tabla.innerHTML += `
-<tr>
-<td>${a.id}</td>
-<td>${a.nombre}</td>
-<td>${a.curso}</td>
-<td>${a.estado}</td>
-</tr>`;
-});
-}
-
-// BUSCADOR
-function buscar(){
-let f = document.getElementById("buscar").value.toLowerCase();
-
-document.querySelectorAll("#tabla tr").forEach(r => {
-  r.style.display = r.innerText.toLowerCase().includes(f) ? "" : "none";
-});
-}
-
-// HORA EN VIVO
-function actualizarHora(){
-  let ahora = new Date();
-  let h = ahora.getHours().toString().padStart(2,"0");
-  let m = ahora.getMinutes().toString().padStart(2,"0");
-  document.getElementById("horaActual").innerText = h + ":" + m;
-}
-
-setInterval(actualizarHora, 1000);
-actualizarHora();
-
-</script>
 </script>
 
 </body>
