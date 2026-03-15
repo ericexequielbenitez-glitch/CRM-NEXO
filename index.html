@@ -2,31 +2,26 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Kairo CRM - Gestión alumnos</title>
-
-<!-- Librerías -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-
+<title>Kairo CRM</title>
 <style>
-    body { font-family: Arial, sans-serif; margin: 0; background:#f4f6f9; }
-    header { background:#1b4f72; color:white; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
-    header h1 { margin:0; font-size:20px; }
-    .top-actions button { margin-left:10px; }
-    .btn { padding:8px 12px; border:none; border-radius:4px; cursor:pointer; font-size:13px; }
-    .btn-primary { background:#007bff; color:white; }
-    .btn-success { background:#28a745; color:white; }
-    .btn-danger { background:#dc3545; color:white; }
-    .btn-secondary { background:#6c757d; color:white; }
-    .container { padding:20px; }
-    .card { background:white; border-radius:6px; padding:15px; margin-bottom:20px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-    .label { font-weight:bold; }
-    input, select { padding:6px; border-radius:4px; border:1px solid #ccc; width:100%; max-width:300px; }
-    table { width:100%; border-collapse:collapse; margin-top:10px; }
-    th, td { border:1px solid #ddd; padding:8px; }
-    th { background:#eee; }
-    #loginScreen { display:flex; height:100vh; align-items:center; justify-content:center; background:#1b4f72; }
-    #loginBox { background:white; padding:25px; border-radius:8px; width:320px; box-shadow:0 2px 6px rgba(0,0,0,0.3); }
+  body { font-family: Arial, sans-serif; margin:0; background:#f4f6f9; }
+  header { background:#1b4f72; color:#fff; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
+  header h1 { margin:0; font-size:18px; }
+  .btn { padding:8px 12px; border:none; border-radius:4px; cursor:pointer; font-size:13px; }
+  .btn-primary { background:#007bff; color:#fff; }
+  .btn-success { background:#28a745; color:#fff; }
+  .btn-danger { background:#dc3545; color:#fff; }
+  .btn-secondary { background:#6c757d; color:#fff; }
+  .container { padding:20px; }
+  .card { background:#fff; border-radius:6px; padding:15px; margin-bottom:20px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+  label { font-weight:bold; display:block; margin-top:8px; }
+  input, select { padding:6px; border-radius:4px; border:1px solid #ccc; width:100%; max-width:320px; }
+  table { width:100%; border-collapse:collapse; margin-top:10px; }
+  th, td { border:1px solid #ddd; padding:6px; font-size:13px; }
+  th { background:#eee; }
+  #loginScreen { display:flex; height:100vh; align-items:center; justify-content:center; background:#1b4f72; }
+  #loginBox { background:#fff; padding:25px; border-radius:8px; width:320px; box-shadow:0 2px 6px rgba(0,0,0,0.3); }
+  #app { display:none; }
 </style>
 </head>
 <body>
@@ -35,49 +30,39 @@
 <div id="loginScreen">
   <div id="loginBox">
     <h2>Kairo CRM</h2>
-
-    <label>Vendedor</label><br>
-    <select id="loginUser"></select><br><br>
-
-    <label>Contraseña</label><br>
-    <input id="loginPass" type="password" placeholder="Contraseña"><br><br>
-
+    <label for="loginLegajo">Legajo</label>
+    <input id="loginLegajo" placeholder="Ej: V601256">
+    <label for="loginPass">Contraseña</label>
+    <input id="loginPass" type="password" placeholder="Contraseña">
+    <br><br>
     <button class="btn btn-primary" onclick="login()">Ingresar</button>
   </div>
 </div>
 
 <!-- APP -->
-<div id="app" style="display:none;">
+<div id="app">
   <header>
-    <h1>Gestión alumnos - Kairo</h1>
-    <div class="top-actions">
+    <h1>Kairo CRM – Gestión de alumnos</h1>
+    <div>
+      <span id="vendedorInfo" style="margin-right:10px;"></span>
       <button class="btn btn-secondary" onclick="mostrarPanel('inicio')">Inicio</button>
-      <button class="btn btn-primary" onclick="mostrarPanel('buscar')">Buscar alumnos</button>
-      <button class="btn btn-success" onclick="mostrarPanel('nueva')">Nueva inscripción</button>
+      <button class="btn btn-primary" onclick="mostrarPanel('nueva')">Nueva inscripción</button>
       <button class="btn btn-danger" onclick="logout()">Cerrar sesión</button>
     </div>
   </header>
 
   <div class="container">
-
     <!-- PANEL INICIO -->
     <div id="panelInicio" class="card">
-      <h2>Inicio</h2>
-      <p>Bienvenido a Kairo CRM - Gestión de alumnos.</p>
-      <p><span class="label">Alumnos totales:</span> <span id="resAlumnos">0</span></p>
-    </div>
-
-    <!-- PANEL BUSCAR -->
-    <div id="panelBuscar" class="card" style="display:none;">
-      <h2>Buscar alumnos</h2>
-      <input id="busquedaAlumno" placeholder="Ej: Juan, ALU-123">
-      <button class="btn btn-primary" onclick="buscarAlumno()">Buscar</button>
-      <div id="resultadoBusqueda"></div>
+      <h3>Inicio</h3>
+      <p>Bienvenido al CRM de Kairo.</p>
+      <p><b>Alumnos registrados (esta sesión):</b> <span id="contadorAlumnos">0</span></p>
+      <div id="listaAlumnos"></div>
     </div>
 
     <!-- PANEL NUEVA INSCRIPCIÓN -->
     <div id="panelNueva" class="card" style="display:none;">
-      <h2>Nueva inscripción</h2>
+      <h3>Nueva inscripción</h3>
 
       <label>Nombre del alumno</label>
       <input id="nuevoNombre">
@@ -128,83 +113,83 @@
         <option value="inactivo">Inactivo</option>
       </select>
 
-      <h3>Cursos disponibles</h3>
+      <h4>Cursos disponibles</h4>
       <div id="listaCursos"></div>
 
-      <h3>Duración</h3>
+      <label>Duración (meses)</label>
       <select id="duracion" onchange="actualizarTotal()">
         <option value="1">1 mes</option>
         <option value="3">3 meses</option>
         <option value="6">6 meses</option>
       </select>
 
-      <h3>Total</h3>
+      <h4>Monto mensual</h4>
       <p id="totalMostrar">$0</p>
 
       <button class="btn btn-success" onclick="crearAlumno()">Registrar alumno</button>
     </div>
-
   </div>
 </div>
 
 <script>
 // CONFIG
-const URL_WEBAPP_VENDEDORES = "https://script.google.com/macros/s/AKfycbyUeLq5wnBqRHhtsCSdKPR5aHXlJiqpKuSoDFnSt0-hT85JJrpVqAesiapgtf2WI98CLA/exec";
-const URL_WEBAPP_ALUMNOS = "https://script.google.com/macros/s/AKfycbzDNyRC0fWJpS6ZDoWtfzomcBDFh7_wWVRJqpEcnbkBfrZCWjFM6w1UekFT8ch-kDqz/exec";
-
-const MP_PUBLIC_KEY = "APP_USR-24e13e97-3f85-4a5b-a859-478a1b9ef88d";
-const MP_ACCESS_TOKEN = "APP_USR-3385521442823122-031511-3a833bdaafe97ed820f896519f5e77c0-306613517";
-
+const URL_WEBAPP_VENDEDORES = "https://script.google.com/macros/s/AKfycbwnwXIm-i_jV0HUAVKfDxA7THzqk7RwjNLylOoAiwYB8DF7XDcPizW0SUq8r2-Va2vibg/exec";
+const URL_WEBAPP_ALUMNOS   = "https://script.google.com/macros/s/AKfycbxY0mIsK2MOWTimfLw5uHrvnCTol4lhQDzOpReTt8126-3chAwv5L_0Y16WYkaU43iK/exec";
 
 // LOGIN
-async function cargarUsuarios() {
-  const res = await fetch(URL_WEBAPP_VENDEDORES);
-  const data = await res.json();
+async function login() {
+  const legajo = document.getElementById("loginLegajo").value.trim();
+  const pass   = document.getElementById("loginPass").value.trim();
 
-  loginUser.innerHTML = "";
-
-  data.usuarios.forEach(u => {
-    const opt = document.createElement("option");
-    opt.value = JSON.stringify(u);
-    opt.textContent = `${u.legajo} – ${u.nombre}`;
-    loginUser.appendChild(opt);
-  });
-}
-cargarUsuarios();
-
-function login() {
-  const vendedor = JSON.parse(loginUser.value);
-  const pass = loginPass.value;
-
-  if (pass !== "kairo2025") {
-    alert("Contraseña incorrecta");
+  if (!legajo || !pass) {
+    alert("Completá legajo y contraseña");
     return;
   }
 
-  localStorage.setItem("vendedorLegajo", vendedor.legajo);
-  localStorage.setItem("vendedorNombre", vendedor.nombre);
+  try {
+    const res = await fetch(URL_WEBAPP_VENDEDORES, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ legajo, pass })
+    });
+    const data = await res.json();
 
-  loginScreen.style.display = "none";
-  app.style.display = "block";
-  cargarDatos();
+    if (!data.ok) {
+      alert(data.error || "Error de autenticación");
+      return;
+    }
+
+    localStorage.setItem("vendedorLegajo", data.legajo);
+    localStorage.setItem("vendedorNombre", data.nombre);
+
+    document.getElementById("vendedorInfo").innerText =
+      `Vendedor: ${data.legajo} – ${data.nombre}`;
+
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    mostrarPanel("inicio");
+    renderAlumnos();
+
+  } catch (err) {
+    console.error(err);
+    alert("Error al conectar con el servidor de vendedores");
+  }
 }
 
 function logout() {
-  app.style.display = "none";
-  loginScreen.style.display = "flex";
+  localStorage.removeItem("vendedorLegajo");
+  localStorage.removeItem("vendedorNombre");
+  document.getElementById("app").style.display = "none";
+  document.getElementById("loginScreen").style.display = "flex";
 }
-
 
 // NAVEGACIÓN
-function mostrarPanel(p) {
-  panelInicio.style.display = "none";
-  panelBuscar.style.display = "none";
-  panelNueva.style.display = "none";
-  if (p === "inicio") panelInicio.style.display = "block";
-  if (p === "buscar") panelBuscar.style.display = "block";
-  if (p === "nueva") panelNueva.style.display = "block";
+function mostrarPanel(panel) {
+  document.getElementById("panelInicio").style.display = "none";
+  document.getElementById("panelNueva").style.display = "none";
+  if (panel === "inicio") document.getElementById("panelInicio").style.display = "block";
+  if (panel === "nueva")  document.getElementById("panelNueva").style.display  = "block";
 }
-
 
 // CURSOS
 const cursos = [
@@ -226,6 +211,7 @@ const cursos = [
 ];
 
 let carrito = [];
+let alumnosSesion = [];
 
 function cargarCursos() {
   let html = "<table><tr><th>Curso</th><th>Precio</th><th>Elegir</th></tr>";
@@ -234,7 +220,7 @@ function cargarCursos() {
       <tr>
         <td>${c.nombre}</td>
         <td>$${c.precio}</td>
-        <td><input type='checkbox' onchange='toggleCurso(${i})'></td>
+        <td><input type="checkbox" onchange="toggleCurso(${i})"></td>
       </tr>`;
   });
   html += "</table>";
@@ -245,166 +231,124 @@ cargarCursos();
 function toggleCurso(i) {
   const curso = cursos[i];
   const existe = carrito.find(c => c.nombre === curso.nombre);
-  if (existe) carrito = carrito.filter(c => c.nombre !== curso.nombre);
-  else carrito.push(curso);
+  if (existe) {
+    carrito = carrito.filter(c => c.nombre !== curso.nombre);
+  } else {
+    carrito.push(curso);
+  }
   actualizarTotal();
 }
 
 function actualizarTotal() {
   const meses = parseInt(document.getElementById("duracion").value);
-  const total = carrito.reduce((acc, c) => acc + c.precio, 0) * meses;
-  document.getElementById("totalMostrar").innerText = "$" + total;
+  const totalMensual = carrito.reduce((acc, c) => acc + c.precio, 0);
+  document.getElementById("totalMostrar").innerText = "$" + totalMensual;
 }
-
-
-// BASE DE DATOS LOCAL
-let alumnos = JSON.parse(localStorage.getItem("alumnos_kairo")) || [];
-function guardar() { localStorage.setItem("alumnos_kairo", JSON.stringify(alumnos)); }
-
-function cargarDatos() {
-  actualizarResumen();
-  generarFacturasAutomaticas();
-  actualizarPagosAutomaticos();
-}
-
 
 // CREAR ALUMNO
 async function crearAlumno() {
-  if (carrito.length === 0) return alert("Elegí al menos un curso");
+  const nombre    = document.getElementById("nuevoNombre").value.trim();
+  const email     = document.getElementById("nuevoEmail").value.trim();
+  const pais      = document.getElementById("nuevoPais").value;
+  const provincia = document.getElementById("nuevoProvincia").value;
+  const dni       = document.getElementById("nuevoDni").value.trim();
+  const estado    = document.getElementById("nuevoEstado").value;
+  const meses     = parseInt(document.getElementById("duracion").value);
+  const montoMensual = carrito.reduce((acc, c) => acc + c.precio, 0);
 
-  const nombre = nuevoNombre.value.trim();
-  const email = nuevoEmail.value.trim();
-  const pais = nuevoPais.value.trim();
-  const provincia = nuevoProvincia.value.trim();
-  const dni = nuevoDni.value.trim();
-  const estado = nuevoEstado.value;
-  const meses = parseInt(duracion.value);
+  if (!nombre || !email || !dni || carrito.length === 0) {
+    alert("Completá todos los datos y elegí al menos un curso");
+    return;
+  }
 
-  if (!nombre || !email || !pais || !provincia || !dni) {
-    return alert("Completá todos los datos");
+  const vendedorLegajo = localStorage.getItem("vendedorLegajo");
+  const vendedorNombre = localStorage.getItem("vendedorNombre");
+
+  if (!vendedorLegajo || !vendedorNombre) {
+    alert("Sesión de vendedor no válida. Cerrá sesión e ingresá de nuevo.");
+    return;
   }
 
   const id = "ALU-" + Date.now();
-  const montoMensual = carrito.reduce((acc, c) => acc + c.precio, 0);
-  const fechaInscripcion = new Date().toISOString().split('T')[0];
+  const fechaInscripcion = new Date().toISOString().split("T")[0];
 
-  const qr = await generarQRAlumno(id, nombre, email, montoMensual);
-
-  const alumno = {
+  const payload = {
     id,
+    fechaInscripcion,
     nombre,
     email,
     pais,
     provincia,
     dni,
-    cursos: carrito,
+    cursos: carrito.map(c => ({ nombre: c.nombre, precio: c.precio })),
     montoMensual,
     duracion: meses,
     estado,
-    qr,
-    fechaInscripcion,
-    vendedorLegajo: localStorage.getItem("vendedorLegajo"),
-    vendedorNombre: localStorage.getItem("vendedorNombre"),
-    facturas: []
+    vendedorLegajo,
+    vendedorNombre
   };
 
-  alumnos.push(alumno);
-  guardar();
-  enviarAGoogleSheets(alumno);
+  try {
+    const res = await fetch(URL_WEBAPP_ALUMNOS, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
 
-  alert("Alumno registrado correctamente");
-  carrito = [];
-  actualizarResumen();
+    if (data.status !== "ok") {
+      alert("Error al registrar alumno en Sheets");
+      console.error(data);
+      return;
+    }
+
+    alumnosSesion.push(payload);
+    renderAlumnos();
+    limpiarFormulario();
+    alert("Alumno registrado correctamente");
+
+  } catch (err) {
+    console.error(err);
+    alert("Error al conectar con la WebApp de alumnos");
+  }
 }
 
+function renderAlumnos() {
+  const cont = document.getElementById("listaAlumnos");
+  const contador = document.getElementById("contadorAlumnos");
+  contador.innerText = alumnosSesion.length;
 
-// RESUMEN
-function actualizarResumen() {
-  resAlumnos.innerText = alumnos.length;
-}
+  if (alumnosSesion.length === 0) {
+    cont.innerHTML = "<p>No hay alumnos registrados en esta sesión.</p>";
+    return;
+  }
 
-
-// BUSCAR
-function buscarAlumno() {
-  const q = busquedaAlumno.value.toLowerCase();
-  const cont = resultadoBusqueda;
-  cont.innerHTML = "";
-
-  const res = alumnos.filter(a => a.nombre.toLowerCase().includes(q) || a.id.includes(q));
-  if (res.length === 0) return cont.innerHTML = "<p>No encontrado</p>";
-
-  res.forEach(a => {
-    const facturasHtml = a.facturas.map(f => `
+  let html = "<table><tr><th>ID</th><th>Nombre</th><th>Email</th><th>Cursos</th><th>Vendedor</th></tr>";
+  alumnosSesion.forEach(a => {
+    html += `
       <tr>
-        <td>${f.numero}</td>
-        <td>${f.emision}</td>
-        <td>${f.vencimiento}</td>
-        <td>${f.estado}</td>
-        <td>${f.fechaPago || ""}</td>
-      </tr>
-    `).join("");
-
-    cont.innerHTML += `
-      <div class='card'>
-        <h3>${a.nombre} (${a.id})</h3>
-        <p><b>DNI:</b> ${a.dni}</p>
-        <p><b>País:</b> ${a.pais} - <b>Provincia:</b> ${a.provincia}</p>
-        <p><b>Cursos:</b> ${a.cursos.map(c => c.nombre).join(", ")}</p>
-        <p><b>Monto mensual:</b> $${a.montoMensual}</p>
-        <p><b>Duración:</b> ${a.duracion} meses</p>
-        <p><b>Estado:</b> ${a.estado}</p>
-        <p><b>Venta realizada por:</b> ${a.vendedorLegajo} – ${a.vendedorNombre}</p>
-        <p><b>QR de pago:</b> <a href="${a.qr}" target="_blank">Abrir link de pago</a></p>
-
-        <h4>Facturas</h4>
-        <table>
-          <tr><th>Número</th><th>Emisión</th><th>Vencimiento</th><th>Estado</th><th>Fecha pago</th></tr>
-          ${facturasHtml}
-        </table>
-
-        <br>
-        <button class='btn btn-success' onclick="descargarFactura('${a.id}')">Descargar primera factura pendiente en PDF</button>
-      </div>`;
+        <td>${a.id}</td>
+        <td>${a.nombre}</td>
+        <td>${a.email}</td>
+        <td>${a.cursos.map(c => c.nombre).join(", ")}</td>
+        <td>${a.vendedorLegajo} – ${a.vendedorNombre}</td>
+      </tr>`;
   });
+  html += "</table>";
+  cont.innerHTML = html;
 }
 
-
-// MERCADO PAGO - QR POR ALUMNO
-async function generarQRAlumno(id, nombre, email, monto) {
-  const body = {
-    items: [{ title:`Pago mensual - ${nombre}`, quantity:1, unit_price:monto }],
-    external_reference:id,
-    payer:{ name:nombre, email }
-  };
-
-  const res = await fetch("https://api.mercadopago.com/checkout/preferences", {
-    method:"POST",
-    headers:{
-      "Authorization":`Bearer ${MP_ACCESS_TOKEN}`,
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify(body)
-  });
-
-  const data = await res.json();
-  return data.init_point;
+function limpiarFormulario() {
+  document.getElementById("nuevoNombre").value = "";
+  document.getElementById("nuevoEmail").value = "";
+  document.getElementById("nuevoDni").value = "";
+  document.getElementById("nuevoEstado").value = "preactivo";
+  document.getElementById("duracion").value = "1";
+  carrito = [];
+  cargarCursos();
+  actualizarTotal();
 }
+</script>
 
-
-// FACTURACIÓN AUTOMÁTICA EL DÍA 01
-function generarFacturasAutomaticas() {
-  const hoy = new Date();
-  const dia = hoy.getDate();
-  if (dia !== 1) return;
-
-  alumnos.forEach(alumno => {
-    if (alumno.estado !== "activo") return;
-
-    const fechaIns = new Date(alumno.fechaInscripcion);
-    const mesesContratados = alumno.duracion;
-
-    for (let i = 0; i < mesesContratados; i++) {
-      const fechaMes = new Date(fechaIns.getFullYear(), fechaIns.getMonth() + i, 1);
-      if (hoy < fechaMes) continue;
-
-      const mes = (fechaMes.getMonth() + 1).
+</body>
+</html>
