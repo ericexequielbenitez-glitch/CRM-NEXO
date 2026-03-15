@@ -1,31 +1,34 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
 
 <meta charset="UTF-8">
 <title>CRM Instituto</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
 <style>
 
 body{
-background:#f5f7fb;
 font-family:Arial;
+margin:0;
+background:#f4f6f9;
 }
 
 .sidebar{
 width:220px;
 height:100vh;
-background:#1e293b;
-position:fixed;
+background:#1f2937;
 color:white;
+position:fixed;
 padding:20px;
 }
 
 .sidebar button{
 width:100%;
-margin-bottom:10px;
+padding:10px;
+margin-top:10px;
+border:none;
+cursor:pointer;
 }
 
 .main{
@@ -34,29 +37,31 @@ padding:40px;
 }
 
 .card{
-border:none;
-box-shadow:0 4px 12px rgba(0,0,0,0.08);
+background:white;
+padding:25px;
+border-radius:8px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
 }
 
 .hidden{
 display:none;
 }
 
-.step{
-display:flex;
-gap:10px;
-margin-bottom:25px;
+input,select{
+padding:8px;
+margin:5px;
+width:220px;
 }
 
-.step div{
-padding:6px 12px;
-background:#e5e7eb;
-border-radius:20px;
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
 }
 
-.active{
-background:#2563eb;
-color:white;
+td,th{
+border-bottom:1px solid #ddd;
+padding:10px;
 }
 
 </style>
@@ -67,17 +72,16 @@ color:white;
 
 <!-- LOGIN -->
 
-<div id="login" class="container mt-5">
+<div id="login" style="display:flex;justify-content:center;align-items:center;height:100vh;">
 
-<div class="card p-4 mx-auto" style="max-width:400px">
+<div class="card">
 
-<h4>Login CRM</h4>
+<h3>Login CRM</h3>
 
-<input id="user" class="form-control mb-2" placeholder="Usuario">
+<input id="user" placeholder="Usuario"><br>
+<input id="pass" type="password" placeholder="Contraseña"><br>
 
-<input id="pass" type="password" class="form-control mb-3" placeholder="Contraseña">
-
-<button class="btn btn-primary w-100" onclick="login()">Ingresar</button>
+<button onclick="login()">Ingresar</button>
 
 </div>
 
@@ -89,61 +93,35 @@ color:white;
 
 <div class="sidebar">
 
-<h4>CRM</h4>
+<h3>CRM</h3>
 
-<button class="btn btn-light" onclick="dashboard()">Dashboard</button>
+<button onclick="dashboard()">Dashboard</button>
 
-<button class="btn btn-success" onclick="nuevaVenta()">Nueva venta</button>
+<button onclick="nuevaVenta()">Nueva venta</button>
 
-<button class="btn btn-primary" onclick="verAlumnos()">Buscar alumnos</button>
+<button onclick="verAlumnos()">Buscar alumnos</button>
 
 </div>
 
 <div class="main">
 
-<!-- DASHBOARD -->
+<div id="panel" class="card">
 
-<div id="panel">
-
-<div class="card p-4">
-
-<h4>Panel</h4>
+<h3>Panel</h3>
 
 <p>Bienvenido al CRM del instituto</p>
 
 </div>
 
-</div>
+<div id="venta" class="card hidden"></div>
 
-<!-- WIZARD -->
+<div id="alumnos" class="card hidden">
 
-<div id="wizard" class="hidden">
+<h3>Alumnos</h3>
 
-<div class="step">
+<input id="buscar" placeholder="Buscar..." onkeyup="buscar()">
 
-<div id="s1" class="active">Datos</div>
-<div id="s2">Curso</div>
-<div id="s3">Promo</div>
-<div id="s4">Pago</div>
-<div id="s5">Final</div>
-
-</div>
-
-<div class="card p-4" id="contenido"></div>
-
-</div>
-
-<!-- ALUMNOS -->
-
-<div id="alumnos" class="hidden">
-
-<div class="card p-4">
-
-<h4>Alumnos</h4>
-
-<input id="buscar" class="form-control mb-3" placeholder="Buscar..." onkeyup="buscar()">
-
-<table class="table">
+<table>
 
 <thead>
 
@@ -166,24 +144,21 @@ color:white;
 
 </div>
 
-</div>
-
 <script>
 
-let usuarios=[
+const usuarios=[
 {user:"admin",pass:"1234"},
 {user:"ventas",pass:"1234"}
 ]
 
 let alumnos=JSON.parse(localStorage.getItem("alumnos"))||[]
 
-let paso=1
 let venta={}
 
 function login(){
 
-let u=document.getElementById("user").value.trim()
-let p=document.getElementById("pass").value.trim()
+let u=document.getElementById("user").value
+let p=document.getElementById("pass").value
 
 let ok=usuarios.find(x=>x.user===u && x.pass===p)
 
@@ -192,11 +167,9 @@ if(ok){
 document.getElementById("login").style.display="none"
 document.getElementById("crm").classList.remove("hidden")
 
-dashboard()
-
 }else{
 
-alert("Usuario o contraseña incorrectos")
+alert("Usuario incorrecto")
 
 }
 
@@ -204,14 +177,13 @@ alert("Usuario o contraseña incorrectos")
 
 function ocultar(){
 
-document.querySelectorAll("#panel,#wizard,#alumnos").forEach(x=>x.classList.add("hidden"))
+document.querySelectorAll("#panel,#venta,#alumnos").forEach(x=>x.classList.add("hidden"))
 
 }
 
 function dashboard(){
 
 ocultar()
-
 document.getElementById("panel").classList.remove("hidden")
 
 }
@@ -220,53 +192,23 @@ function nuevaVenta(){
 
 ocultar()
 
-document.getElementById("wizard").classList.remove("hidden")
+let v=document.getElementById("venta")
 
-paso=1
+v.classList.remove("hidden")
 
-mostrarPaso()
+v.innerHTML=`
 
-}
+<h3>Nueva Venta</h3>
 
-function verAlumnos(){
+<h4>Datos personales</h4>
 
-ocultar()
+<input id="nombre" placeholder="Nombre">
+<input id="apellido" placeholder="Apellido">
+<input id="dni" placeholder="DNI">
 
-document.getElementById("alumnos").classList.remove("hidden")
+<h4>Curso</h4>
 
-render()
-
-}
-
-function mostrarPaso(){
-
-let c=document.getElementById("contenido")
-
-if(paso===1){
-
-c.innerHTML=`
-
-<h5>Datos personales</h5>
-
-<input id="nombre" class="form-control mb-2" placeholder="Nombre">
-
-<input id="apellido" class="form-control mb-2" placeholder="Apellido">
-
-<input id="dni" class="form-control mb-2" placeholder="DNI">
-
-<button class="btn btn-primary mt-2" onclick="guardarDatos()">Siguiente</button>
-
-`
-
-}
-
-if(paso===2){
-
-c.innerHTML=`
-
-<h5>Curso</h5>
-
-<select id="curso" class="form-select mb-2" onchange="precio()">
+<select id="curso" onchange="precio()">
 
 <option value="">Curso</option>
 <option value="idioma">Idioma</option>
@@ -275,21 +217,11 @@ c.innerHTML=`
 
 </select>
 
-<div id="carrito"></div>
+<div id="precio"></div>
 
-<button class="btn btn-primary mt-2" onclick="siguiente()">Siguiente</button>
+<h4>Promoción</h4>
 
-`
-
-}
-
-if(paso===3){
-
-c.innerHTML=`
-
-<h5>Promoción</h5>
-
-<select id="promo" class="form-select mb-2" onchange="precioPromo()">
+<select id="promo" onchange="promo()">
 
 <option value="0">Sin promo</option>
 <option value="25">25%</option>
@@ -299,60 +231,22 @@ c.innerHTML=`
 
 </select>
 
-<div id="promoPrecio"></div>
+<div id="total"></div>
 
-<button class="btn btn-primary mt-2" onclick="siguiente()">Siguiente</button>
+<h4>Pago</h4>
 
-`
-
-}
-
-if(paso===4){
-
-c.innerHTML=`
-
-<h5>Pago</h5>
-
-<select id="pago" class="form-select mb-2" onchange="comprobante()">
+<select id="pago">
 
 <option>No pagó</option>
 <option>Pagó</option>
 
 </select>
 
-<div id="comp" class="hidden">
+<br><br>
 
-<input type="file" class="form-control">
-
-</div>
-
-<button class="btn btn-success mt-2" onclick="finalizar()">Finalizar</button>
+<button onclick="finalizar()">Registrar alumno</button>
 
 `
-
-}
-
-}
-
-function guardarDatos(){
-
-venta.nombre=document.getElementById("nombre").value
-venta.apellido=document.getElementById("apellido").value
-venta.dni=document.getElementById("dni").value
-
-siguiente()
-
-}
-
-function siguiente(){
-
-paso++
-
-document.querySelectorAll(".step div").forEach(x=>x.classList.remove("active"))
-
-document.getElementById("s"+paso).classList.add("active")
-
-mostrarPaso()
 
 }
 
@@ -368,50 +262,35 @@ if(curso==="office"){ins=7;men=10}
 if(curso==="tecnico"){ins=10;men=15}
 
 venta.curso=curso
-venta.ins=ins
-venta.men=men
+venta.mensual=men
 
-document.getElementById("carrito").innerHTML=
+document.getElementById("precio").innerHTML=
 
-Inscripción: USD ${ins} <br> Cuota mensual: USD ${men}
+"Inscripción: USD "+ins+"<br>Cuota mensual: USD "+men
 
 }
 
-function precioPromo(){
+function promo(){
 
-let promo=parseInt(document.getElementById("promo").value)
+let p=parseInt(document.getElementById("promo").value)
 
-let total=venta.men
+let total=venta.mensual
 
-if(venta.curso==="idioma" && promo===10){
+if(venta.curso==="idioma" && p===10){
 
 total=total*0.9
 
 }else{
 
-total=total*(1-promo/100)
+total=total*(1-p/100)
 
 }
 
 venta.total=total
 
-document.getElementById("promoPrecio").innerHTML=
+document.getElementById("total").innerHTML=
 
-Cuota con promo: USD ${total.toFixed(2)}
-
-}
-
-function comprobante(){
-
-if(document.getElementById("pago").value==="Pagó"){
-
-document.getElementById("comp").classList.remove("hidden")
-
-}else{
-
-document.getElementById("comp").classList.add("hidden")
-
-}
+"Cuota con promo: USD "+total.toFixed(2)
 
 }
 
@@ -429,24 +308,35 @@ return "GEST-"+Date.now()
 
 function finalizar(){
 
-venta.id=generarID()
-venta.gestion=generarGestion()
+let alumno={
 
-venta.estado=document.getElementById("pago").value==="Pagó"?"Activo":"Inactivo"
+id:generarID(),
+gestion:generarGestion(),
 
-alumnos.push(venta)
+nombre:document.getElementById("nombre").value,
+curso:venta.curso,
+
+estado:document.getElementById("pago").value==="Pagó"?"Activo":"Inactivo"
+
+}
+
+alumnos.push(alumno)
 
 localStorage.setItem("alumnos",JSON.stringify(alumnos))
 
-document.getElementById("contenido").innerHTML=
+alert("Alumno registrado")
 
-`<h4>Alumno registrado</h4>
+dashboard()
 
-<p>ID alumno: ${venta.id}</p>
+}
 
-<p>Número gestión: ${venta.gestion}</p>
+function verAlumnos(){
 
-<button class="btn btn-primary" onclick="dashboard()">Volver</button>`
+ocultar()
+
+document.getElementById("alumnos").classList.remove("hidden")
+
+render()
 
 }
 
@@ -477,11 +367,11 @@ tabla.innerHTML+=`
 
 function buscar(){
 
-let filtro=document.getElementById("buscar").value.toLowerCase()
+let f=document.getElementById("buscar").value.toLowerCase()
 
-document.querySelectorAll("#tabla tr").forEach(f=>{
+document.querySelectorAll("#tabla tr").forEach(r=>{
 
-f.style.display=f.innerText.toLowerCase().includes(filtro)?"":"none"
+r.style.display=r.innerText.toLowerCase().includes(f)?"":"none"
 
 })
 
