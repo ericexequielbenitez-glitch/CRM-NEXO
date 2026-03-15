@@ -146,7 +146,11 @@ font-weight:bold;
 </div>
 
 <script>
-const usuarios=[{user:"admin",pass:"1234"},{user:"ventas",pass:"1234"}]
+const usuarios = [
+  {user:"admin", pass:"1234"},
+  {user:"ventas", pass:"1234"}
+]
+
 let alumnos=JSON.parse(localStorage.getItem("alumnos"))||[]
 let paso=1
 let venta={}
@@ -172,13 +176,16 @@ const precios={
 }
 
 function login(){
-let u=document.getElementById("user").value
-let p=document.getElementById("pass").value
-let ok=usuarios.find(x=>x.user===u && x.pass===p)
-if(ok){
-document.getElementById("login").style.display="none"
-document.getElementById("crm").classList.remove("hidden")
-}else{alert("Usuario o contraseña incorrectos")}
+  let u=document.getElementById("user").value.trim().toLowerCase()
+  let p=document.getElementById("pass").value.trim()
+  let ok=usuarios.find(x=>x.user.toLowerCase()===u && x.pass===p)
+  if(ok){
+    document.getElementById("login").style.display="none"
+    document.getElementById("crm").classList.remove("hidden")
+    dashboard()
+  } else {
+    alert("Usuario o contraseña incorrectos")
+  }
 }
 
 function ocultar(){document.querySelectorAll("#panel,#wizard,#alumnos").forEach(x=>x.classList.add("hidden"))}
@@ -273,10 +280,4 @@ function finalizar(){
 let alumno={id:generarID(),gestion:generarGestion(),nombre:venta.nombre,curso:(venta.cursos||[]).join(", "),estado:document.getElementById("pago").value==="Pagó"?"Activo":"Inactivo"}
 alumnos.push(alumno)
 localStorage.setItem("alumnos",JSON.stringify(alumnos))
-alert("Alumno registrado")
-dashboard()
-}
-
-function verAlumnos(){ocultar();document.getElementById("alumnos").classList.remove("hidden");render()}
-function render(){
-let tabla=document
+alert("Alumno
