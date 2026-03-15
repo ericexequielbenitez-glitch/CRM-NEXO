@@ -41,6 +41,7 @@ background:white;
 padding:25px;
 border-radius:8px;
 box-shadow:0 4px 10px rgba(0,0,0,0.1);
+max-width:600px;
 }
 
 .hidden{
@@ -51,17 +52,6 @@ input,select{
 padding:8px;
 margin:5px;
 width:220px;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
-}
-
-td,th{
-border-bottom:1px solid #ddd;
-padding:10px;
 }
 
 </style>
@@ -108,12 +98,11 @@ padding:10px;
 <div id="panel" class="card">
 
 <h3>Panel</h3>
-
-<p>Bienvenido al CRM del instituto</p>
+<p>Bienvenido al CRM</p>
 
 </div>
 
-<div id="venta" class="card hidden"></div>
+<div id="wizard" class="card hidden"></div>
 
 <div id="alumnos" class="card hidden">
 
@@ -121,17 +110,15 @@ padding:10px;
 
 <input id="buscar" placeholder="Buscar..." onkeyup="buscar()">
 
-<table>
+<table width="100%">
 
 <thead>
-
 <tr>
 <th>ID</th>
 <th>Nombre</th>
 <th>Curso</th>
 <th>Estado</th>
 </tr>
-
 </thead>
 
 <tbody id="tabla"></tbody>
@@ -153,6 +140,7 @@ const usuarios=[
 
 let alumnos=JSON.parse(localStorage.getItem("alumnos"))||[]
 
+let paso=1
 let venta={}
 
 function login(){
@@ -167,17 +155,13 @@ if(ok){
 document.getElementById("login").style.display="none"
 document.getElementById("crm").classList.remove("hidden")
 
-}else{
-
-alert("Usuario incorrecto")
-
 }
 
 }
 
 function ocultar(){
 
-document.querySelectorAll("#panel,#venta,#alumnos").forEach(x=>x.classList.add("hidden"))
+document.querySelectorAll("#panel,#wizard,#alumnos").forEach(x=>x.classList.add("hidden"))
 
 }
 
@@ -190,23 +174,44 @@ document.getElementById("panel").classList.remove("hidden")
 
 function nuevaVenta(){
 
+paso=1
+venta={}
+
 ocultar()
 
-let v=document.getElementById("venta")
+document.getElementById("wizard").classList.remove("hidden")
 
-v.classList.remove("hidden")
+mostrarPaso()
 
-v.innerHTML=`
+}
 
-<h3>Nueva Venta</h3>
+function mostrarPaso(){
 
-<h4>Datos personales</h4>
+let w=document.getElementById("wizard")
+
+if(paso===1){
+
+w.innerHTML=`
+
+<h3>Paso 1 — Datos personales</h3>
 
 <input id="nombre" placeholder="Nombre">
 <input id="apellido" placeholder="Apellido">
 <input id="dni" placeholder="DNI">
 
-<h4>Curso</h4>
+<br><br>
+
+<button onclick="guardarDatos()">Siguiente</button>
+
+`
+
+}
+
+if(paso===2){
+
+w.innerHTML=`
+
+<h3>Paso 2 — Curso</h3>
 
 <select id="curso" onchange="precio()">
 
@@ -219,7 +224,19 @@ v.innerHTML=`
 
 <div id="precio"></div>
 
-<h4>Promoción</h4>
+<br>
+
+<button onclick="siguiente()">Siguiente</button>
+
+`
+
+}
+
+if(paso===3){
+
+w.innerHTML=`
+
+<h3>Paso 3 — Promoción</h3>
 
 <select id="promo" onchange="promo()">
 
@@ -233,7 +250,19 @@ v.innerHTML=`
 
 <div id="total"></div>
 
-<h4>Pago</h4>
+<br>
+
+<button onclick="siguiente()">Siguiente</button>
+
+`
+
+}
+
+if(paso===4){
+
+w.innerHTML=`
+
+<h3>Paso 4 — Pago</h3>
 
 <select id="pago">
 
@@ -244,9 +273,27 @@ v.innerHTML=`
 
 <br><br>
 
-<button onclick="finalizar()">Registrar alumno</button>
+<button onclick="finalizar()">Finalizar</button>
 
 `
+
+}
+
+}
+
+function guardarDatos(){
+
+venta.nombre=document.getElementById("nombre").value
+
+siguiente()
+
+}
+
+function siguiente(){
+
+paso++
+
+mostrarPaso()
 
 }
 
@@ -312,10 +359,8 @@ let alumno={
 
 id:generarID(),
 gestion:generarGestion(),
-
-nombre:document.getElementById("nombre").value,
+nombre:venta.nombre,
 curso:venta.curso,
-
 estado:document.getElementById("pago").value==="Pagó"?"Activo":"Inactivo"
 
 }
@@ -351,12 +396,10 @@ alumnos.forEach(a=>{
 tabla.innerHTML+=`
 
 <tr>
-
 <td>${a.id}</td>
 <td>${a.nombre}</td>
 <td>${a.curso}</td>
 <td>${a.estado}</td>
-
 </tr>
 
 `
