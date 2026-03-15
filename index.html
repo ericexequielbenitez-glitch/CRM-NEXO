@@ -29,9 +29,6 @@
     #loginBox { background:white; padding:25px; border-radius:8px; width:320px; box-shadow:0 2px 6px rgba(0,0,0,0.3); }
     #loginBox h2 { margin-top:0; text-align:center; }
     .small { font-size:12px; color:#666; }
-    table { border-collapse:collapse; width:100%; font-size:13px; }
-    th, td { border:1px solid #ddd; padding:6px; text-align:left; }
-    th { background:#f0f0f0; }
 </style>
 </head>
 <body>
@@ -118,9 +115,7 @@
 </div>
 
 <script>
-// -------------------------------------------------------------
-// LOGIN SIMPLE
-// -------------------------------------------------------------
+// LOGIN
 function login() {
   const u = document.getElementById('loginUser').value;
   const p = document.getElementById('loginPass').value;
@@ -138,9 +133,7 @@ function logout() {
   document.getElementById('loginScreen').style.display = 'flex';
 }
 
-// -------------------------------------------------------------
-// NAVEGACIÓN ENTRE PANELES
-// -------------------------------------------------------------
+// NAVEGACIÓN
 function mostrarPanel(panel) {
   document.getElementById('panelInicio').style.display = 'none';
   document.getElementById('panelBuscar').style.display = 'none';
@@ -153,29 +146,18 @@ function mostrarPanel(panel) {
   if (panel === 'inicio') actualizarResumen();
 }
 
-// -------------------------------------------------------------
-// 🔐 CREDENCIALES MERCADO PAGO (PEGÁ LAS REALES AQUÍ)
-// -------------------------------------------------------------
+// MERCADO PAGO
 const MP_PUBLIC_KEY = "APP_USR-24e13e97-3f85-4a5b-a859-478a1b9ef88d";
 const MP_ACCESS_TOKEN = "APP_USR-3385521442823122-031511-3a833bdaafe97ed820f896519f5e77c0-306613517";
 
-// -------------------------------------------------------------
-// LOGO KAIRO (BASE64) – PEGAR VALOR COMPLETO AQUÍ
-// -------------------------------------------------------------
-const KAIRO_LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAJYCAYAAABt0Ax7AAAACXBIWXMAAAsTAAALEwEAmpwYAAAgAElEQVR4nOzdZ3hU1f7/8c+5M7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO7szO";
-
-// -------------------------------------------------------------
-// BASE DE DATOS LOCAL
-// -------------------------------------------------------------
+// BASE DE DATOS
 let alumnos = JSON.parse(localStorage.getItem('alumnos_kairo')) || [];
 
 function guardarAlumnos() {
   localStorage.setItem('alumnos_kairo', JSON.stringify(alumnos));
 }
 
-// -------------------------------------------------------------
-// CREAR ALUMNO (NUEVA INSCRIPCIÓN)
-// -------------------------------------------------------------
+// CREAR ALUMNO
 async function crearAlumno() {
   const nombre = document.getElementById('nuevoNombre').value.trim();
   const email = document.getElementById('nuevoEmail').value.trim();
@@ -188,7 +170,6 @@ async function crearAlumno() {
   }
 
   const id = "ALU-" + Date.now();
-
   const qrURL = await generarQR(id, nombre, email, monto);
 
   const alumno = {
@@ -198,28 +179,16 @@ async function crearAlumno() {
     curso,
     monto,
     qr: qrURL,
-    facturas: []
+    facturas: [ generarFactura({ id, nombre, monto, qr: qrURL }) ]
   };
-
-  alumno.facturas.push(generarFactura(alumno));
 
   alumnos.push(alumno);
   guardarAlumnos();
   alert('Alumno creado correctamente');
-  limpiarNuevaInscripcion();
   actualizarResumen();
 }
 
-function limpiarNuevaInscripcion() {
-  document.getElementById('nuevoNombre').value = "";
-  document.getElementById('nuevoEmail').value = "";
-  document.getElementById('nuevoCurso').value = "";
-  document.getElementById('nuevoMonto').value = "";
-}
-
-// -------------------------------------------------------------
-// GENERAR FACTURA MENSUAL
-// -------------------------------------------------------------
+// FACTURA
 function generarFactura(alumno) {
   const hoy = new Date();
   const mes = hoy.getMonth() + 1;
@@ -234,9 +203,7 @@ function generarFactura(alumno) {
   };
 }
 
-// -------------------------------------------------------------
-// RESUMEN INICIO
-// -------------------------------------------------------------
+// RESUMEN
 function actualizarResumen() {
   let totalAlumnos = alumnos.length;
   let pendientes = 0;
@@ -254,9 +221,7 @@ function actualizarResumen() {
   document.getElementById('resPagadas').innerText = pagadas;
 }
 
-// -------------------------------------------------------------
-// BUSCAR ALUMNO
-// -------------------------------------------------------------
+// BUSCAR
 function buscarAlumno() {
   const q = document.getElementById('busquedaAlumno').value.trim().toLowerCase();
   const cont = document.getElementById('resultadoBusqueda');
@@ -293,9 +258,7 @@ function buscarAlumno() {
   });
 }
 
-// -------------------------------------------------------------
-// MERCADO PAGO – GENERAR PREFERENCIA (QR)
-// -------------------------------------------------------------
+// MERCADO PAGO QR
 async function generarQR(id, nombre, email, monto) {
   const body = {
     items: [
@@ -319,12 +282,10 @@ async function generarQR(id, nombre, email, monto) {
   });
 
   const data = await res.json();
-  return data.init_point; // URL que usamos para el QR
+  return data.init_point;
 }
 
-// -------------------------------------------------------------
-// DESCARGAR FACTURA PDF
-// -------------------------------------------------------------
+// PDF CON LOGO DESDE ARCHIVO
 async function descargarFactura(id) {
   const alumno = alumnos.find(a => a.id === id);
   if (!alumno) return;
@@ -333,34 +294,37 @@ async function descargarFactura(id) {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
 
-  // Logo
-  if (KAIRO_LOGO_BASE64 !== "PEGAR_AQUI_LOGO_BASE64") {
-    pdf.addImage(KAIRO_LOGO_BASE64, "PNG", 10, 10, 40, 40);
-  }
+  const img = new Image();
+  img.src = "kairo logo.png"; // <-- TU ARCHIVO
 
-  pdf.setFontSize(18);
-  pdf.text("Factura Kairo", 70, 20);
+  img.onload = function () {
+    pdf.addImage(img, "PNG", 10, 10, 40, 40);
 
-  pdf.setFontSize(12);
-  pdf.text(`Alumno: ${alumno.nombre}`, 10, 60);
-  pdf.text(`ID: ${alumno.id}`, 10, 70);
-  pdf.text(`Curso: ${alumno.curso}`, 10, 80);
-  pdf.text(`Factura: ${factura.numero}`, 10, 90);
-  pdf.text(`Monto: $${alumno.monto}`, 10, 100);
-  pdf.text(`Emisión: ${factura.emision}`, 10, 110);
-  pdf.text(`Vencimiento: ${factura.vencimiento}`, 10, 120);
+    pdf.setFontSize(18);
+    pdf.text("Factura Kairo", 70, 20);
 
-  // QR
-  const qr = new QRious({ value: factura.qr, size: 200 });
-  pdf.text("Escaneá para pagar:", 10, 135);
-  pdf.addImage(qr.toDataURL(), "PNG", 10, 140, 60, 60);
+    pdf.setFontSize(12);
+    pdf.text(`Alumno: ${alumno.nombre}`, 10, 60);
+    pdf.text(`ID: ${alumno.id}`, 10, 70);
+    pdf.text(`Curso: ${alumno.curso}`, 10, 80);
+    pdf.text(`Factura: ${factura.numero}`, 10, 90);
+    pdf.text(`Monto: $${alumno.monto}`, 10, 100);
+    pdf.text(`Emisión: ${factura.emision}`, 10, 110);
+    pdf.text(`Vencimiento: ${factura.vencimiento}`, 10, 120);
 
-  pdf.save(`Factura-${factura.numero}.pdf`);
+    const qr = new QRious({ value: factura.qr, size: 200 });
+    pdf.text("Escaneá para pagar:", 10, 135);
+    pdf.addImage(qr.toDataURL(), "PNG", 10, 140, 60, 60);
+
+    pdf.save(`Factura-${factura.numero}.pdf`);
+  };
+
+  img.onerror = function () {
+    alert("No se pudo cargar el logo. Revisá que 'kairo logo.png' esté en la misma carpeta.");
+  };
 }
 
-// -------------------------------------------------------------
-// MARCAR FACTURA COMO PAGADA
-// -------------------------------------------------------------
+// MARCAR COMO PAGADO
 function marcarPagado(id) {
   const alumno = alumnos.find(a => a.id === id);
   if (!alumno) return;
