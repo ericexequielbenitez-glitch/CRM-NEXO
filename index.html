@@ -2,353 +2,815 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Kairo CRM</title>
+<title>Kairo - CRM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-  body { font-family: Arial, sans-serif; margin:0; background:#f4f6f9; }
-  header { background:#1b4f72; color:#fff; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
-  header h1 { margin:0; font-size:18px; }
-  .btn { padding:8px 12px; border:none; border-radius:4px; cursor:pointer; font-size:13px; }
-  .btn-primary { background:#007bff; color:#fff; }
-  .btn-success { background:#28a745; color:#fff; }
-  .btn-danger { background:#dc3545; color:#fff; }
-  .btn-secondary { background:#6c757d; color:#fff; }
-  .container { padding:20px; }
-  .card { background:#fff; border-radius:6px; padding:15px; margin-bottom:20px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-  label { font-weight:bold; display:block; margin-top:8px; }
-  input, select { padding:6px; border-radius:4px; border:1px solid #ccc; width:100%; max-width:320px; }
-  table { width:100%; border-collapse:collapse; margin-top:10px; }
-  th, td { border:1px solid #ddd; padding:6px; font-size:13px; }
-  th { background:#eee; }
-  #loginScreen { display:flex; height:100vh; align-items:center; justify-content:center; background:#1b4f72; }
-  #loginBox { background:#fff; padding:25px; border-radius:8px; width:320px; box-shadow:0 2px 6px rgba(0,0,0,0.3); }
-  #app { display:none; }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Poppins", sans-serif;
+    }
+
+    body {
+        background: #0d0d0d;
+        color: #fff;
+        min-height: 100vh;
+    }
+
+    /* LOGIN */
+
+    #view-login {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-container {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 40px;
+        border-radius: 15px;
+        width: 350px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 25px rgba(0,0,0,0.4);
+        text-align: center;
+    }
+
+    .logo-login {
+        width: 120px;
+        margin-bottom: 20px;
+    }
+
+    .login-container h2 {
+        margin-bottom: 25px;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .login-container input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border: none;
+        outline: none;
+        font-size: 15px;
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 12px;
+        margin-top: 15px;
+        background: #ffcc00;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-login:hover {
+        background: #e6b800;
+    }
+
+    .error-login {
+        margin-top: 15px;
+        color: #ff4d4d;
+        font-size: 14px;
+        display: none;
+    }
+
+    /* PANEL */
+
+    #view-panel {
+        display: none;
+        min-height: 100vh;
+        display: flex;
+    }
+
+    .sidebar {
+        width: 240px;
+        background: #111;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        border-right: 1px solid #222;
+    }
+
+    .sidebar .logo {
+        width: 140px;
+        margin-bottom: 10px;
+    }
+
+    .sidebar h3 {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #aaa;
+    }
+
+    .menu {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .menu button {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: none;
+        background: #1b1b1b;
+        color: #fff;
+        text-align: left;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.2s;
+    }
+
+    .menu button:hover,
+    .menu button.active {
+        background: #ffcc00;
+        color: #000;
+    }
+
+    .logout {
+        margin-top: auto;
+    }
+
+    .logout button {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: none;
+        background: #ff4d4d;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.2s;
+    }
+
+    .logout button:hover {
+        background: #e63b3b;
+    }
+
+    .main {
+        flex: 1;
+        padding: 25px;
+        overflow-y: auto;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .header h1 {
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    .header span {
+        font-size: 14px;
+        color: #ccc;
+    }
+
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .card {
+        background: #151515;
+        padding: 18px;
+        border-radius: 12px;
+        border: 1px solid #222;
+    }
+
+    .card h3 {
+        font-size: 13px;
+        color: #aaa;
+        margin-bottom: 8px;
+    }
+
+    .card p {
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    .section {
+        background: #151515;
+        border-radius: 12px;
+        border: 1px solid #222;
+        padding: 18px;
+        margin-bottom: 20px;
+    }
+
+    .section h2 {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 13px;
+    }
+
+    th, td {
+        padding: 8px;
+        border-bottom: 1px solid #222;
+        text-align: left;
+    }
+
+    th {
+        color: #ccc;
+        font-weight: 500;
+    }
+
+    tr:hover {
+        background: #1b1b1b;
+    }
+
+    .badge {
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+    }
+
+    .badge-pend {
+        background: #ffcc00;
+        color: #000;
+    }
+
+    .badge-ok {
+        background: #4dff4d;
+        color: #000;
+    }
+
+    .badge-moroso {
+        background: #ff4d4d;
+        color: #fff;
+    }
+
+    .small {
+        font-size: 12px;
+        color: #aaa;
+    }
+
+    /* Modal MP */
+    .modal-bg {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal {
+        background: #151515;
+        padding: 20px;
+        border-radius: 12px;
+        width: 360px;
+        border: 1px solid #222;
+    }
+
+    .modal h3 {
+        margin-bottom: 10px;
+    }
+
+    .modal label {
+        font-size: 13px;
+        color: #ccc;
+        display: block;
+        margin-top: 8px;
+        margin-bottom: 3px;
+    }
+
+    .modal input {
+        width: 100%;
+        padding: 8px;
+        border-radius: 8px;
+        border: none;
+        margin-bottom: 5px;
+        font-size: 13px;
+        outline: none;
+    }
+
+    .modal .btn-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .btn-primary {
+        flex: 1;
+        padding: 9px;
+        border-radius: 8px;
+        border: none;
+        background: #ffcc00;
+        color: #000;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-secondary {
+        flex: 1;
+        padding: 9px;
+        border-radius: 8px;
+        border: none;
+        background: #333;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .link-box {
+        margin-top: 8px;
+        background: #111;
+        padding: 8px;
+        border-radius: 8px;
+        font-size: 11px;
+        word-break: break-all;
+    }
+
+    .msg {
+        font-size: 12px;
+        margin-top: 5px;
+        display: none;
+    }
+
+    .msg.error { color: #ff4d4d; }
+    .msg.ok { color: #4dff4d; }
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div id="loginScreen">
-  <div id="loginBox">
-    <h2>Kairo CRM</h2>
-    <label for="loginLegajo">Legajo</label>
-    <input id="loginLegajo" placeholder="Ej: V601256">
-    <label for="loginPass">Contraseña</label>
-    <input id="loginPass" type="password" placeholder="Contraseña">
-    <br><br>
-    <button class="btn btn-primary" onclick="login()">Ingresar</button>
-  </div>
+<div id="view-login">
+    <div class="login-container">
+        <img src="Kairo logo.png" class="logo-login" alt="Kairo Logo">
+        <h2>Acceso de Vendedores</h2>
+
+        <input type="text" id="legajo" placeholder="Legajo">
+        <input type="password" id="pass" placeholder="Contraseña">
+
+        <button class="btn-login" onclick="login()">Ingresar</button>
+
+        <div id="msgErrorLogin" class="error-login"></div>
+    </div>
 </div>
 
-<!-- APP -->
-<div id="app">
-  <header>
-    <h1>Kairo CRM – Gestión de alumnos</h1>
-    <div>
-      <span id="vendedorInfo" style="margin-right:10px;"></span>
-      <button class="btn btn-secondary" onclick="mostrarPanel('inicio')">Inicio</button>
-      <button class="btn btn-primary" onclick="mostrarPanel('nueva')">Nueva inscripción</button>
-      <button class="btn btn-danger" onclick="logout()">Cerrar sesión</button>
-    </div>
-  </header>
+<!-- PANEL -->
+<div id="view-panel">
+    <div class="sidebar">
+        <img src="Kairo logo.png" class="logo" alt="Kairo Logo">
+        <h3>Menú</h3>
+        <div class="menu">
+            <button class="active" onclick="mostrarSeccion('dashboard')">Dashboard</button>
+            <button onclick="mostrarSeccion('alumnos')">Alumnos</button>
+            <button onclick="mostrarSeccion('historial')">Historial de pagos</button>
+            <button onclick="abrirModalMP()">Mercado Pago</button>
+        </div>
 
-  <div class="container">
-    <!-- PANEL INICIO -->
-    <div id="panelInicio" class="card">
-      <h3>Inicio</h3>
-      <p>Bienvenido al CRM de Kairo.</p>
-      <p><b>Alumnos registrados (esta sesión):</b> <span id="contadorAlumnos">0</span></p>
-      <div id="listaAlumnos"></div>
+        <div class="logout">
+            <button onclick="logout()">Cerrar sesión</button>
+        </div>
     </div>
 
-    <!-- PANEL NUEVA INSCRIPCIÓN -->
-    <div id="panelNueva" class="card" style="display:none;">
-      <h3>Nueva inscripción</h3>
+    <div class="main">
+        <div class="header">
+            <div>
+                <h1>Panel de Vendedor</h1>
+                <span id="subtituloVendedor"></span>
+            </div>
+            <div class="small" id="fechaHoy"></div>
+        </div>
 
-      <label>Nombre del alumno</label>
-      <input id="nuevoNombre">
+        <!-- DASHBOARD -->
+        <div id="seccion-dashboard">
+            <div class="cards">
+                <div class="card">
+                    <h3>Alumnos activos</h3>
+                    <p id="cardAlumnos">-</p>
+                </div>
+                <div class="card">
+                    <h3>Facturas pendientes</h3>
+                    <p id="cardFactPend">-</p>
+                </div>
+                <div class="card">
+                    <h3>Facturas pagadas</h3>
+                    <p id="cardFactPag">-</p>
+                </div>
+                <div class="card">
+                    <h3>Ventas totales</h3>
+                    <p id="cardVentas">-</p>
+                </div>
+                <div class="card">
+                    <h3>Monto vendido</h3>
+                    <p id="cardMonto">$ -</p>
+                </div>
+            </div>
 
-      <label>Email</label>
-      <input id="nuevoEmail">
+            <div class="section">
+                <h2>Resumen rápido</h2>
+                <p class="small">
+                    Acá ves un resumen de tus alumnos, facturación y ventas.  
+                    Más abajo podés entrar al detalle de alumnos y pagos.
+                </p>
+            </div>
+        </div>
 
-      <label>País</label>
-      <select id="nuevoPais">
-        <option value="Argentina">Argentina</option>
-      </select>
+        <!-- ALUMNOS -->
+        <div id="seccion-alumnos" style="display:none;">
+            <div class="section">
+                <h2>Mis alumnos</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Alumno</th>
+                            <th>DNI</th>
+                            <th>Curso</th>
+                            <th>Estado</th>
+                            <th>Meses</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaAlumnos">
+                        <tr><td colspan="6" class="small">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-      <label>Provincia</label>
-      <select id="nuevoProvincia">
-        <option value="Buenos Aires">Buenos Aires</option>
-        <option value="CABA">CABA</option>
-        <option value="Catamarca">Catamarca</option>
-        <option value="Chaco">Chaco</option>
-        <option value="Chubut">Chubut</option>
-        <option value="Córdoba">Córdoba</option>
-        <option value="Corrientes">Corrientes</option>
-        <option value="Entre Ríos">Entre Ríos</option>
-        <option value="Formosa">Formosa</option>
-        <option value="Jujuy">Jujuy</option>
-        <option value="La Pampa">La Pampa</option>
-        <option value="La Rioja">La Rioja</option>
-        <option value="Mendoza">Mendoza</option>
-        <option value="Misiones">Misiones</option>
-        <option value="Neuquén">Neuquén</option>
-        <option value="Río Negro">Río Negro</option>
-        <option value="Salta">Salta</option>
-        <option value="San Juan">San Juan</option>
-        <option value="San Luis">San Luis</option>
-        <option value="Santa Cruz">Santa Cruz</option>
-        <option value="Santa Fe">Santa Fe</option>
-        <option value="Santiago del Estero">Santiago del Estero</option>
-        <option value="Tierra del Fuego">Tierra del Fuego</option>
-        <option value="Tucumán">Tucumán</option>
-      </select>
+        <!-- HISTORIAL -->
+        <div id="seccion-historial" style="display:none;">
+            <div class="section">
+                <h2>Historial de pagos</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Alumno</th>
+                            <th>Monto</th>
+                            <th>Medio</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaHistorial">
+                        <tr><td colspan="5" class="small">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-      <label>DNI</label>
-      <input id="nuevoDni">
-
-      <label>Estado del alumno</label>
-      <select id="nuevoEstado">
-        <option value="preactivo">Preactivo</option>
-        <option value="activo">Activo</option>
-        <option value="inactivo">Inactivo</option>
-      </select>
-
-      <h4>Cursos disponibles</h4>
-      <div id="listaCursos"></div>
-
-      <label>Duración (meses)</label>
-      <select id="duracion" onchange="actualizarTotal()">
-        <option value="1">1 mes</option>
-        <option value="3">3 meses</option>
-        <option value="6">6 meses</option>
-      </select>
-
-      <h4>Monto mensual</h4>
-      <p id="totalMostrar">$0</p>
-
-      <button class="btn btn-success" onclick="crearAlumno()">Registrar alumno</button>
     </div>
-  </div>
+</div>
+
+<!-- MODAL MERCADO PAGO -->
+<div class="modal-bg" id="modalMP">
+    <div class="modal">
+        <h3>Generar link de pago</h3>
+
+        <label for="mpAlumno">Alumno</label>
+        <input type="text" id="mpAlumno" placeholder="Nombre del alumno">
+
+        <label for="mpIdAlumno">ID Alumno</label>
+        <input type="text" id="mpIdAlumno" placeholder="ID interno del alumno">
+
+        <label for="mpDescripcion">Descripción</label>
+        <input type="text" id="mpDescripcion" value="Cuota mensual Kairo">
+
+        <label for="mpMonto">Monto</label>
+        <input type="number" id="mpMonto" placeholder="Ej: 15000">
+
+        <div class="msg error" id="mpMsgError"></div>
+        <div class="msg ok" id="mpMsgOk"></div>
+        <div class="link-box" id="mpLinkBox" style="display:none;"></div>
+
+        <div class="btn-row">
+            <button class="btn-secondary" onclick="cerrarModalMP()">Cerrar</button>
+            <button class="btn-primary" onclick="generarLinkMP()">Generar</button>
+        </div>
+    </div>
 </div>
 
 <script>
-// URLs de tus WebApps
-const URL_WEBAPP_VENDEDORES = "https://script.google.com/macros/s/AKfycbxBixDksX_EV5pZjjjGBkqEDqQcKeRGG96QgQtCjQy9RtVmWGgihDtA7nVQhEjgrlunHA/exec";
-const URL_WEBAPP_ALUMNOS   = "https://script.google.com/macros/s/AKfycbxY0mIsK2MOWTimfLw5uHrvnCTol4lhQDzOpReTt8126-3chAwv5L_0Y16WYkaU43iK/exec";
+const WEBAPP_URL = "TU_URL_WEBAPP_AQUI"; // poné acá la URL del WebApp
 
-// LOGIN
-async function login() {
-  const legajo = document.getElementById("loginLegajo").value.trim();
-  const pass   = document.getElementById("loginPass").value.trim();
+let legajo = null;
+let nombreVendedor = null;
 
-  if (!legajo || !pass) {
-    alert("Completá legajo y contraseña");
-    return;
-  }
+/* INICIO */
 
-  try {
-    const res = await fetch(URL_WEBAPP_VENDEDORES, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ legajo, pass })
-    });
+document.addEventListener("DOMContentLoaded", () => {
+    // Si ya hay sesión, ir directo al panel
+    const leg = localStorage.getItem("legajo");
+    const nom = localStorage.getItem("nombre");
 
-    const data = await res.json();
-
-    if (!data.ok) {
-      alert(data.error || "Error de autenticación");
-      return;
+    if (leg && nom) {
+        legajo = leg;
+        nombreVendedor = nom;
+        mostrarPanel();
+        return;
     }
 
-    localStorage.setItem("vendedorLegajo", data.legajo);
-    localStorage.setItem("vendedorNombre", data.nombre);
+    mostrarLogin();
+});
 
-    document.getElementById("vendedorInfo").innerText =
-      `Vendedor: ${data.legajo} – ${data.nombre}`;
+/* LOGIN */
 
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    mostrarPanel("inicio");
-    renderAlumnos();
+function mostrarLogin() {
+    document.getElementById("view-login").style.display = "flex";
+    document.getElementById("view-panel").style.display = "none";
+}
 
-  } catch (err) {
-    console.error(err);
-    alert("Error al conectar con el servidor de vendedores");
-  }
+function mostrarPanel() {
+    document.getElementById("view-login").style.display = "none";
+    document.getElementById("view-panel").style.display = "flex";
+
+    document.getElementById("subtituloVendedor").innerText =
+        "Vendedor: " + nombreVendedor + " (" + legajo + ")";
+
+    const hoy = new Date();
+    document.getElementById("fechaHoy").innerText =
+        hoy.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+    cargarDashboard();
+    cargarAlumnos();
+    cargarHistorial();
+}
+
+async function login() {
+    const leg = document.getElementById("legajo").value.trim();
+    const pass = document.getElementById("pass").value.trim();
+    const msgError = document.getElementById("msgErrorLogin");
+
+    msgError.style.display = "none";
+
+    if (!leg || !pass) {
+        msgError.innerText = "Completa todos los campos.";
+        msgError.style.display = "block";
+        return;
+    }
+
+    try {
+        const response = await fetch(WEBAPP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ accion: "login", legajo: leg, pass })
+        });
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            msgError.innerText = data.error;
+            msgError.style.display = "block";
+            return;
+        }
+
+        legajo = data.legajo;
+        nombreVendedor = data.nombre;
+
+        localStorage.setItem("legajo", legajo);
+        localStorage.setItem("nombre", nombreVendedor);
+
+        mostrarPanel();
+
+    } catch (err) {
+        msgError.innerText = "Error de conexión con el servidor.";
+        msgError.style.display = "block";
+    }
 }
 
 function logout() {
-  localStorage.removeItem("vendedorLegajo");
-  localStorage.removeItem("vendedorNombre");
-  document.getElementById("app").style.display = "none";
-  document.getElementById("loginScreen").style.display = "flex";
+    localStorage.removeItem("legajo");
+    localStorage.removeItem("nombre");
+    legajo = null;
+    nombreVendedor = null;
+    mostrarLogin();
 }
 
-// NAVEGACIÓN
-function mostrarPanel(panel) {
-  document.getElementById("panelInicio").style.display = "none";
-  document.getElementById("panelNueva").style.display = "none";
-  if (panel === "inicio") document.getElementById("panelInicio").style.display = "block";
-  if (panel === "nueva")  document.getElementById("panelNueva").style.display  = "block";
-}
+/* NAVEGACIÓN PANEL */
 
-// CURSOS
-const cursos = [
-  { nombre:"MS Word básico", precio:20000 },
-  { nombre:"MS Word intermedio", precio:20000 },
-  { nombre:"MS Word avanzado", precio:20000 },
-  { nombre:"MS Excel básico", precio:20000 },
-  { nombre:"MS Excel intermedio", precio:20000 },
-  { nombre:"MS Excel avanzado", precio:20000 },
-  { nombre:"MS Publisher básico", precio:20000 },
-  { nombre:"MS Publisher intermedio", precio:20000 },
-  { nombre:"MS Publisher avanzado", precio:20000 },
-  { nombre:"MS Access básico", precio:20000 },
-  { nombre:"MS Access intermedio", precio:20000 },
-  { nombre:"MS Access avanzado", precio:20000 },
-  { nombre:"Inglés", precio:30000 },
-  { nombre:"Francés", precio:30000 },
-  { nombre:"Portugués", precio:30000 }
-];
-
-let carrito = [];
-let alumnosSesion = [];
-
-function cargarCursos() {
-  let html = "<table><tr><th>Curso</th><th>Precio</th><th>Elegir</th></tr>";
-  cursos.forEach((c, i) => {
-    html += `
-      <tr>
-        <td>${c.nombre}</td>
-        <td>$${c.precio}</td>
-        <td><input type="checkbox" onchange="toggleCurso(${i})"></td>
-      </tr>`;
-  });
-  html += "</table>";
-  document.getElementById("listaCursos").innerHTML = html;
-}
-cargarCursos();
-
-function toggleCurso(i) {
-  const curso = cursos[i];
-  const existe = carrito.find(c => c.nombre === curso.nombre);
-  if (existe) {
-    carrito = carrito.filter(c => c.nombre !== curso.nombre);
-  } else {
-    carrito.push(curso);
-  }
-  actualizarTotal();
-}
-
-function actualizarTotal() {
-  const totalMensual = carrito.reduce((acc, c) => acc + c.precio, 0);
-  document.getElementById("totalMostrar").innerText = "$" + totalMensual;
-}
-
-// CREAR ALUMNO
-async function crearAlumno() {
-  const nombre    = document.getElementById("nuevoNombre").value.trim();
-  const email     = document.getElementById("nuevoEmail").value.trim();
-  const pais      = document.getElementById("nuevoPais").value;
-  const provincia = document.getElementById("nuevoProvincia").value;
-  const dni       = document.getElementById("nuevoDni").value.trim();
-  const estado    = document.getElementById("nuevoEstado").value;
-  const montoMensual = carrito.reduce((acc, c) => acc + c.precio, 0);
-  const duracion  = parseInt(document.getElementById("duracion").value);
-
-  if (!nombre || !email || !dni || carrito.length === 0) {
-    alert("Completá todos los datos y elegí al menos un curso");
-    return;
-  }
-
-  const vendedorLegajo = localStorage.getItem("vendedorLegajo");
-  const vendedorNombre = localStorage.getItem("vendedorNombre");
-
-  if (!vendedorLegajo || !vendedorNombre) {
-    alert("Sesión de vendedor no válida. Cerrá sesión e ingresá de nuevo.");
-    return;
-  }
-
-  const id = "ALU-" + Date.now();
-  const fechaInscripcion = new Date().toISOString().split("T")[0];
-
-  const payload = {
-    id,
-    fechaInscripcion,
-    nombre,
-    email,
-    pais,
-    provincia,
-    dni,
-    cursos: carrito.map(c => ({ nombre: c.nombre, precio: c.precio })),
-    montoMensual,
-    duracion,
-    estado,
-    vendedorLegajo,
-    vendedorNombre
-  };
-
-  try {
-    const res = await fetch(URL_WEBAPP_ALUMNOS, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-
-    if (data.status !== "ok") {
-      alert("Error al registrar alumno en Sheets");
-      console.error(data);
-      return;
+function mostrarSeccion(seccion) {
+    document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
+    const botones = {
+        dashboard: 0,
+        alumnos: 1,
+        historial: 2
+    };
+    if (botones[seccion] !== undefined) {
+        document.querySelectorAll(".menu button")[botones[seccion]].classList.add("active");
     }
 
-    alumnosSesion.push(payload);
-    renderAlumnos();
-    limpiarFormulario();
-    alert("Alumno registrado correctamente");
+    document.getElementById("seccion-dashboard").style.display = "none";
+    document.getElementById("seccion-alumnos").style.display = "none";
+    document.getElementById("seccion-historial").style.display = "none";
 
-  } catch (err) {
-    console.error(err);
-    alert("Error al conectar con la WebApp de alumnos");
-  }
+    document.getElementById("seccion-" + seccion).style.display = "block";
 }
 
-function renderAlumnos() {
-  const cont = document.getElementById("listaAlumnos");
-  const contador = document.getElementById("contadorAlumnos");
-  contador.innerText = alumnosSesion.length;
+/* DASHBOARD */
 
-  if (alumnosSesion.length === 0) {
-    cont.innerHTML = "<p>No hay alumnos registrados en esta sesión.</p>";
-    return;
-  }
+async function cargarDashboard() {
+    try {
+        const resp = await fetch(WEBAPP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                accion: "getPanelVendedor",
+                legajo
+            })
+        });
+        const data = await resp.json();
+        if (!data.ok) return;
 
-  let html = "<table><tr><th>ID</th><th>Nombre</th><th>Email</th><th>Cursos</th><th>Vendedor</th></tr>";
-  alumnosSesion.forEach(a => {
-    html += `
-      <tr>
-        <td>${a.id}</td>
-        <td>${a.nombre}</td>
-        <td>${a.email}</td>
-        <td>${a.cursos.map(c => c.nombre).join(", ")}</td>
-        <td>${a.vendedorLegajo} – ${a.vendedorNombre}</td>
-      </tr>`;
-  });
-  html += "</table>";
-  cont.innerHTML = html;
+        const r = data.resumen;
+        document.getElementById("cardAlumnos").innerText   = r.totalAlumnos;
+        document.getElementById("cardFactPend").innerText  = r.totalFactPend;
+        document.getElementById("cardFactPag").innerText   = r.totalFactPag;
+        document.getElementById("cardVentas").innerText    = r.totalVentas;
+        document.getElementById("cardMonto").innerText     = "$ " + r.montoVentas;
+    } catch (e) {
+        console.error(e);
+    }
 }
 
-function limpiarFormulario() {
-  document.getElementById("nuevoNombre").value = "";
-  document.getElementById("nuevoEmail").value = "";
-  document.getElementById("nuevoDni").value = "";
-  document.getElementById("nuevoEstado").value = "preactivo";
-  document.getElementById("duracion").value = "1";
-  carrito = [];
-  cargarCursos();
-  actualizarTotal();
+/* ALUMNOS */
+
+async function cargarAlumnos() {
+    const tbody = document.getElementById("tablaAlumnos");
+    tbody.innerHTML = `<tr><td colspan="6" class="small">Cargando...</td></tr>`;
+    try {
+        const resp = await fetch(WEBAPP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                accion: "getAlumnosVendedor",
+                legajo
+            })
+        });
+        const data = await resp.json();
+        if (!data.ok) {
+            tbody.innerHTML = `<tr><td colspan="6" class="small">${data.error}</td></tr>`;
+            return;
+        }
+
+        if (!data.alumnos || data.alumnos.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="small">Sin alumnos asignados.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = "";
+        data.alumnos.forEach(a => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${a.nombre}</td>
+                <td>${a.dni}</td>
+                <td>${a.curso}</td>
+                <td>
+                    <span class="badge ${a.estado === "ACTIVO" ? "badge-ok" : "badge-moroso"}">
+                        ${a.estado}
+                    </span>
+                </td>
+                <td>${a.mesesContratados}</td>
+                <td>$ ${a.montoMensual}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (e) {
+        console.error(e);
+        tbody.innerHTML = `<tr><td colspan="6" class="small">Error al cargar alumnos.</td></tr>`;
+    }
+}
+
+/* HISTORIAL */
+
+async function cargarHistorial() {
+    const tbody = document.getElementById("tablaHistorial");
+    tbody.innerHTML = `<tr><td colspan="5" class="small">Cargando...</td></tr>`;
+    try {
+        const resp = await fetch(WEBAPP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                accion: "getHistorialVendedor",
+                legajo
+            })
+        });
+        const data = await resp.json();
+        if (!data.ok) {
+            tbody.innerHTML = `<tr><td colspan="5" class="small">${data.error}</td></tr>`;
+            return;
+        }
+
+        if (!data.ventas || data.ventas.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="small">Sin pagos registrados.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = "";
+        data.ventas.forEach(v => {
+            const tr = document.createElement("tr");
+            const fecha = v.fecha ? new Date(v.fecha).toLocaleDateString("es-AR") : "-";
+            tr.innerHTML = `
+                <td>${fecha}</td>
+                <td>${v.alumno}</td>
+                <td>$ ${v.monto}</td>
+                <td>${v.medio}</td>
+                <td>
+                    <span class="badge ${v.estado === "PAGADO" ? "badge-ok" : "badge-pend"}">
+                        ${v.estado}
+                    </span>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (e) {
+        console.error(e);
+        tbody.innerHTML = `<tr><td colspan="5" class="small">Error al cargar historial.</td></tr>`;
+    }
+}
+
+/* MERCADO PAGO */
+
+function abrirModalMP() {
+    document.getElementById("modalMP").style.display = "flex";
+    document.getElementById("mpMsgError").style.display = "none";
+    document.getElementById("mpMsgOk").style.display = "none";
+    document.getElementById("mpLinkBox").style.display = "none";
+}
+
+function cerrarModalMP() {
+    document.getElementById("modalMP").style.display = "none";
+}
+
+async function generarLinkMP() {
+    const alumno = document.getElementById("mpAlumno").value.trim();
+    const idAlumno = document.getElementById("mpIdAlumno").value.trim();
+    const descripcion = document.getElementById("mpDescripcion").value.trim();
+    const monto = document.getElementById("mpMonto").value.trim();
+
+    const msgError = document.getElementById("mpMsgError");
+    const msgOk = document.getElementById("mpMsgOk");
+    const linkBox = document.getElementById("mpLinkBox");
+
+    msgError.style.display = "none";
+    msgOk.style.display = "none";
+    linkBox.style.display = "none";
+
+    if (!alumno || !idAlumno || !monto) {
+        msgError.innerText = "Completá alumno, ID y monto.";
+        msgError.style.display = "block";
+        return;
+    }
+
+    try {
+        const resp = await fetch(WEBAPP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                accion: "generarLinkMP",
+                idAlumno,
+                nombreAlumno: alumno,
+                descripcion,
+                monto: Number(monto),
+                legajo
+            })
+        });
+
+        const data = await resp.json();
+
+        if (!data.ok) {
+            msgError.innerText = data.error || "No se pudo generar el link.";
+            msgError.style.display = "block";
+            return;
+        }
+
+        msgOk.innerText = "Link generado correctamente.";
+        msgOk.style.display = "block";
+
+        linkBox.innerText = data.link;
+        linkBox.style.display = "block";
+
+    } catch (e) {
+        console.error(e);
+        msgError.innerText = "Error de conexión con el servidor.";
+        msgError.style.display = "block";
+    }
 }
 </script>
 
 </body>
 </html>
+
